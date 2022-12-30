@@ -1,0 +1,27 @@
+-- CREATE TABLE IF NOT EXISTS artlinks (
+--     link varchar PRIMARY KEY
+-- );
+
+
+-- STEP 1: Add column with id/name of emote if it does not already exist
+-- ALTER TABLE artlinks ADD COLUMN IF NOT EXISTS emoji3 INTEGER NOT NULL DEFAULT 0;
+
+-- -- STEP 2: Insert link
+-- INSERT INTO artlinks(link) VALUES('https://linkatylink.com')
+-- ON CONFLICT
+-- DO NOTHING;
+
+-- -- STEP 3: Increment column with id/name of emote in the same row as the link
+-- UPDATE artlinks SET emoji3 = emoji3 + 1
+-- WHERE link = 'https://linkatylink.com';
+
+-- DROP TABLE artlinks CASCADE;
+
+-- DELETE FROM artlinks;
+
+SELECT link FROM artlinks WHERE emoji1 > 0;
+
+-- NOTES: 
+-- table name should be the id of the discord server
+-- link should be the same for step 2 and step 3
+-- emoji id should be the same for Step 1 and Step 3
