@@ -1,10 +1,11 @@
 const { token } = require('../config.json');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
-const { onHello } = require('./hello-listener');
-const { onTwitLinkSend, containsLink, grabLink } = require('./twit-link-listener');
+const { parseLink } = require('./link-parser');
 
+// Object to hold links in reactions for testing purposes
 const links = {};
 
+// Create new Client with Intents
 const client = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
@@ -14,35 +15,38 @@ const client = new Client({
 		GatewayIntentBits.GuildEmojisAndStickers,
 	] });
 
+
 // Wait for client to be ready
 client.once(Events.ClientReady, c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
-// MessageCreate Listeners
-// client.on('messageCreate', msg => {
-// 	if (!msg.author.bot) {
-// 		console.log(msg.content);
+// #region Add Listeners
 
-// 		// Replies with link stored for given emote
-// 		if (Object.hasOwn(links, msg.content)) {
-// 			console.log(links[msg.content]);
-// 			msg.reply(links[msg.content]);
-// 		}
-// 	}
+// On MessageCreate
+client.on('messageCreate', msg => {
+	if (!msg.author.bot) {
+		console.log(msg.content);
 
-// });
+		// Replies with link stored for given emote
+		if (Object.hasOwn(links, msg.content)) {
+			console.log(links[msg.content]);
+			msg.reply(links[msg.content]);
+		}
+	}
 
+});
 
+// On GuildCreate
 client.on('guildCreate', guild => {
 	console.log('joined a new guild!');
 
 	// TODO: when bot joins a new guild, make a new table for that guild
 });
 
-// MessageReactionAdd
+// On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
-	const match = grabLink(rctn.message.content);
+	const match = parseLink(rctn.message.content);
 
 	if (match) {
 		// "Built in" emojis don't need the <:>
@@ -53,6 +57,8 @@ client.on('messageReactionAdd', rctn => {
 		console.log(JSON.stringify(links));
 	}
 });
+
+// #endregion
 
 // Log client into discord
 client.login(token);
