@@ -4,7 +4,10 @@ const fa = new RegExp('https://www.furaffinity.net/view/\\S+/');
 const e6 = new RegExp('https://e621.net/posts/\\S+');
 
 /**
- * Finds and returns the first art link in a string.
+ * Finds and returns the first art post link in a string.
+ *
+ * NOTE: vxtwitter, fxtwitter, and twitter links are all valid, but
+ * the returned link will be an fxtwitter link.
  *
  * @param {String} content Message content
  * @returns The first twitter, furaffinity, or e621 link in the
@@ -12,8 +15,18 @@ const e6 = new RegExp('https://e621.net/posts/\\S+');
  */
 function parseLink(content) {
 	if (twit.test(content)) {
-		return twit.exec(content)[0];
-		// TODO: convert plain twitter links to fxtwitter links
+		let link = twit.exec(content)[0];
+
+		// vxtwitter --> fxtwitter
+		if (link.includes('vx')) {
+			link = link.replace('vx', 'fx');
+		}
+		// twitter --> fxtwitter
+		else if (!link.includes('fx')) {
+			link = link.replace('twitter', 'fxtwitter');
+		}
+
+		return link;
 	}
 
 	if (fa.test(content)) {
