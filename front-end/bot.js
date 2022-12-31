@@ -53,8 +53,9 @@ client.on('messageReactionAdd', rctn => {
 		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
 		links[emoji] = match;
 
+		// TODO: remove debug statements
 		rctn.message.reply(match);
-		console.log(JSON.stringify(links));
+		// console.log(JSON.stringify(links));
 	}
 });
 
