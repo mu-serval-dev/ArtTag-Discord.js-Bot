@@ -3,9 +3,13 @@
 const pg = require('pg');
 const { dbstring } = require('../config.json');
 const pgClient = new pg.Client(dbstring);
+
 pgClient.connect();
 
-pgClient.query('SELECT * from artlinks').then(result => {
+const selectQuery = 'SELECT (link, $1) FROM artlinks ORDER BY ($1) DESC';
+const values = ['emoji3', 'artlinks'];
+
+pgClient.query(selectQuery, values).then(result => {
 	console.log(result.rows);
 });
 
