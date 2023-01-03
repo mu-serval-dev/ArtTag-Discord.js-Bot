@@ -18,33 +18,38 @@ const selectQuery = format('SELECT (link, %I) FROM %I WHERE %I > 0 ORDER BY %I D
 console.log(selectQuery);
 
 async function select() {
-	pgClient.query(selectQuery).then(result => {
-		console.log(result);
-		pgClient.end();
-		// TODO: make result obj
-	}, err => {
+
+	let res;
+
+	try {
+		let r = await pgClient.query(selectQuery);
+		res = {
+			rows : r.rows,
+		};
+	}
+	catch (err) {
 		const end = err.stack.indexOf('\n');
 		const errMessage = err.stack.substring(7, end);
 		console.log('Error ' + err.code + ':', errMessage);
-		pgClient.end();
-		const res = {
+		res = {
 			message : errMessage,
 			code : err.code,
 		};
 
-		return res;
-	});
+	}
+
+	pgClient.end();
+	return res;
+
 }
 
-select();
-// pgClient.query(selectQuery, values).then(result => {
-// 	console.log(result.rows);
-// });
-
-// pgClient.query('SELECT emoji1 from artlinks').then(result => {
-// 	console.log(result.rows);
-// 	pgClient.end();
-// });
+select().then(res => {
+	let link = res.rows[1]['row'];
+	link = link.replace('(', '');
+	link = link.replace(')', '');
+	link = link.split(',');
+	console.log(link);
+});
 
 
 // exports.pgClient = pgClient;
