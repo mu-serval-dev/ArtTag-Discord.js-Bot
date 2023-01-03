@@ -12,7 +12,7 @@ pgClient.connect();
 // plan how to handle errors
 // figure out how to export pgClient object
 
-const selectQuery = format('SELECT (link, %I) FROM %I WHERE %I > 0 ORDER BY %I DESC', 'emoji3', 'artlinks', 'emoji3', 'emoji3');
+const selectQuery = format('SELECT (link, %I) FROM %I WHERE %I > 0 ORDER BY %I DESC', 'emoji1', 'artlinks', 'emoji1', 'emoji1');
 console.log(selectQuery);
 
 async function select() {
@@ -42,11 +42,16 @@ async function select() {
 }
 
 select().then(res => {
-	let link = res.rows[1]['row'];
-	link = link.replace('(', '');
-	link = link.replace(')', '');
-	link = link.split(',');
-	console.log(link);
+	const items = [];
+	res.rows.map(item => {
+		let link = item['row'];
+		link = link.replace('(', '');
+		link = link.replace(')', '');
+		link = link.split(',');
+		items.push(link);
+	});
+
+	console.log(items);
 });
 
 
