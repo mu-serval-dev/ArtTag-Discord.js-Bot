@@ -22,7 +22,7 @@ async function select(emoteid, serverid) {
 
 	try {
 		let r = await pool.query(q);
-
+		// TODO: make some parser function to clean up row strings
 		return {
 			'rows' : r.rows,
 			'rowCount' : r.rowCount,
@@ -40,48 +40,19 @@ async function select(emoteid, serverid) {
 
 		};
 	}
-	finally {
-		// TODO: remove this
-		pool.end();
-	}
 }
 
 
-select('emoji1', 'artlinst').then(res => {
+select('emoji1', 'artlinks').then(res => {
 	console.log(res);
+	pool.end();
 }).catch(err => {
 	console.log(err);
 	console.log(err.message);
+	pool.end();
 });
-// const selectQuery = format('SELECT (link, %I) FROM %I WHERE %I > 0 ORDER BY %I DESC', 'emoji1', 'artlinks', 'emoji1', 'emoji1');
-// console.log(selectQuery);
 
-// async function select() {
-
-// 	let res;
-
-// 	try {
-// 		let r = await pool.query(selectQuery);
-// 		res = {
-// 			rows : r.rows,
-// 		};
-// 	}
-// 	catch (err) {
-// 		const end = err.stack.indexOf('\n');
-// 		const errMessage = err.stack.substring(7, end);
-// 		console.log('Error ' + err.code + ':', errMessage);
-// 		res = {
-// 			message : errMessage,
-// 			code : err.code,
-// 		};
-
-// 	}
-
-// 	// pool.end();
-// 	return res;
-
-// }
-
+// TODO: make q result and q error object classes for clarity?
 // select().then(res => {
 // 	const items = [];
 // 	res.rows.map(item => {
