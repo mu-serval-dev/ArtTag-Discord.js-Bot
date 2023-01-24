@@ -18,7 +18,9 @@ async function select(emoteid, serverid) {
 	try {
 		let r = await pool.query(q);
 		// TODO: make some parser function to clean up row strings
-		return new QResult(r.rows, r.rowCount);
+		// each row should contain link, emoteid, and count for emoteid
+		let rows = cleanRows(r.rows, emoteid);
+		return new QResult(rows, r.rowCount);
 	}
 	catch (err) {
 		let end = err.stack.indexOf('\n');
@@ -39,6 +41,32 @@ select('emoji1', 'artlinks').then(res => {
 	pool.end();
 });
 
+
+/**
+ * Parses the string members of an array of objects
+ * returned from a select query into a cleaner object
+ * form containing the artlink, emoteCount, and emoteID.
+ * 
+ * @param {Array} rows Array of objects with row string fields.
+ * @param {string} emoteid ID of emote that was queried.
+ */
+function cleanRows(rows, emoteid) {
+	let items = [];
+	rows.map(item => {
+		let str = item.row;
+		str = str.replace('(', ''); // Remove ()
+		str = str.replace(')', '');
+		str = str.split(',');
+		
+		items.push ({
+			'link' : str[0],
+			'emoteCount' : parseInt(str[1]),
+			'emoteID' : emoteid
+		})
+	})
+
+	return items;
+}
 // TODO: make q result and q error object classes for clarity?
 // select().then(res => {
 // 	const items = [];
