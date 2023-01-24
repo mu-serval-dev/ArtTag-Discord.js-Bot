@@ -67,19 +67,5 @@ function cleanRows(rows, emoteid) {
 
 	return items;
 }
-// TODO: make q result and q error object classes for clarity?
-// select().then(res => {
-// 	const items = [];
-// 	res.rows.map(item => {
-// 		let link = item['row'];
-// 		link = link.replace('(', '');
-// 		link = link.replace(')', '');
-// 		link = link.split(',');
-// 		items.push(link);
-// 	});
-
-// 	console.log(items);
-// });
-
 
 exports.select = select;
