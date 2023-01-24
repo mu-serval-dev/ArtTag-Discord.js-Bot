@@ -1,6 +1,7 @@
 /** Module for retrieving links from the database given an emote tag search key */
 const { pool } = require('./client');
 const format = require('pg-format');
+const { QResult, QError } = require('./q-objects.js');
 
 /**
  * Queries the database table given by serverid for
@@ -17,26 +18,18 @@ async function select(emoteid, serverid) {
 	try {
 		let r = await pool.query(q);
 		// TODO: make some parser function to clean up row strings
-		return {
-			'rows' : r.rows,
-			'rowCount' : r.rowCount,
-		};
+		return new QResult(r.rows, r.rowCount);
 	}
 	catch (err) {
 		let end = err.stack.indexOf('\n');
 		let brief = err.stack.substring(7, end);
 		let message = 'Error ' + err.code + ': ' + brief;
 
-		throw {
-			'message' : message,
-			'brief' : brief,
-			'code' : err.code,
-
-		};
+		return new QError(message, brief, err.code);
 	}
 }
 
-
+// TODO: remove select() call
 select('emoji1', 'artlinks').then(res => {
 	console.log(res);
 	pool.end();
