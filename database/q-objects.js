@@ -1,3 +1,8 @@
+
+/**
+ * Object returned when a PostGres Database
+ * query is completed.
+ */
 class QResult {
     constructor(rows, rowCount) {
         this.rows = rows;
@@ -5,6 +10,10 @@ class QResult {
     }
 }
 
+/**
+ * Object thrown when an error is encountered
+ * while querying a PostGres Database.
+ */
 class QError {
     constructor(message, brief, code) {
         this.message = message;
