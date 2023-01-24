@@ -55,7 +55,7 @@ client.on('guildCreate', guild => {
 client.on('messageReactionAdd', rctn => {
 	const match = parseLink(rctn.message.content);
 
-	if (match) {
+	if (!rctn.message.author.bot && match) {
 		// "Built in" emojis don't need the <:>
 		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
 		links[emoji] = match;
