@@ -1,13 +1,12 @@
-
 /**
  * Object returned when a PostGres Database
  * query is completed.
  */
 class QResult {
-    constructor(rows, rowCount) {
-        this.rows = rows;
-        this.rowCount = rowCount;
-    }
+	constructor(rows, rowCount) {
+		this.rows = rows;
+		this.rowCount = rowCount;
+	}
 }
 
 /**
@@ -15,11 +14,11 @@ class QResult {
  * while querying a PostGres Database.
  */
 class QError {
-    constructor(message, brief, code) {
-        this.message = message;
-        this.brief = brief;
-        this.code = code;
-    }
+	constructor(message, brief, code) {
+		this.message = message;
+		this.brief = brief;
+		this.code = code;
+	}
 }
 
 exports.QResult = QResult;
