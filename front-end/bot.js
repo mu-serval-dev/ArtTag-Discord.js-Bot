@@ -23,6 +23,13 @@ client.once(Events.ClientReady, c => {
 
 // #region Add Listeners
 
+// TODO: add query listeners
+// TODO: handle possible errors
+// 1. A provided emote is not in the database
+// 2. There is no artlink with the given emote tag in the database
+// Note: 2 should technically not be possible with how insertions are handled, but it might
+// be nice to handle in the case deletions/decrements are added later
+
 // On MessageCreate
 client.on('messageCreate', msg => {
 	if (!msg.author.bot) {
