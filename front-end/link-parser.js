@@ -1,4 +1,3 @@
-// Match twitter, fxtwitter, or vxtwitter
 const twit = new RegExp('https://(fx|vx|)twitter.com/\\S+/status/\\S+');
 const fa = new RegExp('https://www.furaffinity.net/view/\\S+/');
 const e6 = new RegExp('https://e621.net/posts/\\S+');
@@ -10,8 +9,7 @@ const e6 = new RegExp('https://e621.net/posts/\\S+');
  * the returned link will be an fxtwitter link.
  *
  * @param {String} content Message content
- * @returns The first twitter, furaffinity, or e621 link in the
- * given string, or null.
+ * @returns The first art post link in the given string.
  */
 function parseLink(content) {
 	if (twit.test(content)) {
