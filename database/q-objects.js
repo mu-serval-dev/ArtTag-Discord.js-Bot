@@ -3,6 +3,11 @@
  * query is completed.
  */
 class QResult {
+	/**
+	 *
+	 * @param {Array} rows
+	 * @param {number} rowCount
+	 */
 	constructor(rows, rowCount) {
 		this.rows = rows;
 		this.rowCount = rowCount;
@@ -14,6 +19,12 @@ class QResult {
  * while querying a PostGres Database.
  */
 class QError {
+	/**
+	 *
+	 * @param {string} message
+	 * @param {string} brief
+	 * @param {number} code
+	 */
 	constructor(message, brief, code) {
 		this.message = message;
 		this.brief = brief;

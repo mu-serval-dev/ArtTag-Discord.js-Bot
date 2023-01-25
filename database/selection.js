@@ -25,7 +25,7 @@ async function select(emoteid, serverid) {
 		let brief = err.stack.substring(7, end);
 		let message = 'Error ' + err.code + ': ' + brief;
 
-		throw new QError(message, brief, err.code);
+		throw new QError(message, brief, parseInt(err.code));
 	}
 }
 
