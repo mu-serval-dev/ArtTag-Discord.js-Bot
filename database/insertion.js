@@ -54,6 +54,7 @@ async function insert(guildID, emoteID, link) {
 
 // NOTE: main source of err should be incorrect guildID, in which case a new table
 // for the guild should be made
+// TODO: remove example insert() call
 insert('artlinks', 'emoji69', 'www.iamalinklookatme.com').then(res => {
 	console.log(res);
 }).catch(err => {

@@ -17,8 +17,7 @@ async function select(emoteid, serverid) {
 
 	try {
 		let r = await pool.query(q);
-		let rows = cleanRows(r.rows, emoteid);
-		return new QResult(rows, r.rowCount);
+		return new QResult(r.rows, r.rowCount);
 	}
 	catch (err) {
 		let end = err.stack.indexOf('\n');
@@ -30,7 +29,7 @@ async function select(emoteid, serverid) {
 }
 
 // TODO: remove select() call
-select('emoji10', 'artlinks').then(res => {
+select('emoji1', 'artlinks').then(res => {
 	console.log(res);
 	pool.end();
 }).catch(err => {
@@ -39,31 +38,5 @@ select('emoji10', 'artlinks').then(res => {
 	pool.end();
 });
 
-
-/**
- * Parses the string members of an array of objects
- * returned from a select query into a cleaner object
- * form containing the artlink, emoteCount, and emoteID.
- *
- * @param {Array} rows Array of objects with row string fields.
- * @param {string} emoteid ID of emote that was queried.
- */
-function cleanRows(rows, emoteid) {
-	let items = [];
-	rows.map(item => {
-		let str = item.row;
-		str = str.replace('(', '');
-		str = str.replace(')', '');
-		str = str.split(',');
-
-		items.push ({
-			'link' : str[0],
-			'emoteCount' : parseInt(str[1]),
-			'emoteID' : emoteid,
-		});
-	});
-
-	return items;
-}
 
 exports.select = select;
