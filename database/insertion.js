@@ -1,10 +1,25 @@
 /** Module for inserting to/updating the database when a new emote reaciton is added to an art post link */
-const db = require('./client.js');
-
+const { pool } = require('./client');
+const format = require('pg-format');
 
 // TODO: add jsdoc tag
-function insert(guildID, emoteID, link) {
-	// TODO
+async function insert(guildID, emoteID, link) {
+	let q = format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS %I INTEGER NOT NULL DEFAULT 0',
+		guildID, emoteID);
+
+	try {
+		let client = await pool.connect();
+	}
+	catch (err) {
+		//
+	}
 }
+
+insert('artlinks', 'emoji1', 'www.iamalinklookatme.com').then(res => {
+	console.log(res);
+}).catch(err => {
+	// TODO
+	console.log(err);
+});
 
 exports.insert = insert;

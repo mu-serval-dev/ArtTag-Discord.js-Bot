@@ -25,12 +25,12 @@ async function select(emoteid, serverid) {
 		let brief = err.stack.substring(7, end);
 		let message = 'Error ' + err.code + ': ' + brief;
 
-		return new QError(message, brief, err.code);
+		throw new QError(message, brief, err.code);
 	}
 }
 
 // TODO: remove select() call
-select('emoji1', 'artlinks').then(res => {
+select('emoji10', 'artlinks').then(res => {
 	console.log(res);
 	pool.end();
 }).catch(err => {
