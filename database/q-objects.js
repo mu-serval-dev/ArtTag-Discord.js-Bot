@@ -12,6 +12,8 @@ class QResult {
 		this.rows = rows;
 		this.rowCount = rowCount;
 	}
+
+	// TODO: add function that cleans rows
 }
 
 /**
