@@ -5,38 +5,12 @@
 class QResult {
 	/**
 	 * Initializes a QResult Object.
-	 * @param {Array} rows Array of objects with row string fields from query.
+	 * @param {Array} rows Array representing rows returned from query.
 	 * @param {number} rowCount Count of rows returned from query.
 	 */
 	constructor(rows, rowCount) {
-		this.rows = this.#cleanRows(rows);
+		this.rows = rows;
 		this.rowCount = rowCount;
-	}
-	
-	/**
-	 * Parses the string members of an array of objects
- 	 * returned from a select query into a cleaner object
- 	 * form containing the artlink, emoteCount, and emoteID.
- 	 *
- 	 * @param {Array} rows Array of objects with row string fields.
- 	 * @param {string} emoteid ID of emote that was queried.
- 	*/
-	#cleanRows(rows, emoteid) {
-		let items = [];
-		rows.map(item => {
-			let str = item.row;
-			str = str.replace('(', '');
-			str = str.replace(')', '');
-			str = str.split(',');
-
-			items.push ({
-				'link' : str[0],
-				'emoteCount' : parseInt(str[1]),
-				'emoteID' : emoteid,
-			});
-		});
-
-		return items;
 	}
 }
 

@@ -4,20 +4,23 @@ const format = require('pg-format');
 const { QResult, QError } = require('./q-objects.js');
 
 /**
- * Queries the database table given by serverid for
- * rows that contain at least 1 count of the given
- * emoteid.
+ * Queries the database table guildID for
+ * rows that contain at least 1 count of the column
+ * emoteID and returns them.
  *
- * @param {string} emoteid
- * @param {string} serverid
+ * @param {string} guildID ID of guild table to query.
+ * @param {string} emoteID ID of emote column to query.
+ * @returns {QResult} An Object detailing the result of the query.
+ * @throws {QError} If a query error occurs, most likely due to
+ * guildID not identifying an existing table.
  */
-async function select(emoteid, serverid) {
+async function select(guildID, emoteID) {
 	let q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
-		emoteid, serverid, emoteid, emoteid);
+		emoteID, guildID, emoteID, emoteID);
 
 	try {
 		let r = await pool.query(q);
-		return new QResult(r.rows, r.rowCount);
+		return new QResult(cleanRows(r.rows, emoteID), r.rowCount);
 	}
 	catch (err) {
 		let end = err.stack.indexOf('\n');
@@ -28,14 +31,37 @@ async function select(emoteid, serverid) {
 	}
 }
 
+/**
+ * Parses the string members of an array of objects
+ * returned from a select query into a cleaner object
+ * form containing the artlink, emoteCount, and emoteID.
+ *
+ * @param {Array} rows Array of objects with row string fields.
+ * @param {string} emoteid ID of emote that was queried.
+*/
+function cleanRows(rows, emoteid) {
+	let items = [];
+	rows.map(item => {
+		let str = item.row;
+		str = str.replace('(', '');
+		str = str.replace(')', '');
+		str = str.split(',');
+
+		items.push ({
+			'link' : str[0],
+			'emoteCount' : parseInt(str[1]),
+			'emoteID' : emoteid,
+		});
+	});
+	
+	return items;
+}
+
 // TODO: remove select() call
-select('emoji1', 'artlinks').then(res => {
+select('artlinks', 'emoji1').then(res => {
 	console.log(res);
-	pool.end();
 }).catch(err => {
 	console.log(err);
-	console.log(err.message);
-	pool.end();
 });
 
 
