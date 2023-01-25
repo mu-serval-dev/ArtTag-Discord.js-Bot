@@ -12,7 +12,8 @@ const { QResult, QError } = require('./q-objects.js');
  * @param {string} emoteID ID of emote column to query.
  * @returns {QResult} An Object detailing the result of the query.
  * @throws {QError} If a query error occurs, most likely due to
- * guildID not identifying an existing table.
+ * guildID not identifying an existing table or emoteID not identifying
+ * an existing column in that table.
  */
 async function select(guildID, emoteID) {
 	let q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
@@ -20,14 +21,11 @@ async function select(guildID, emoteID) {
 
 	try {
 		let r = await pool.query(q);
-		return new QResult(cleanRows(r.rows, emoteID), r.rowCount);
+		let rows = cleanRows(r.rows, emoteID);
+		return new QResult(rows, r.rowCount);
 	}
 	catch (err) {
-		let end = err.stack.indexOf('\n');
-		let brief = err.stack.substring(7, end);
-		let message = 'Error ' + err.code + ': ' + brief;
-
-		throw new QError(message, brief, parseInt(err.code));
+		throw new QError(err);
 	}
 }
 
@@ -53,7 +51,7 @@ function cleanRows(rows, emoteid) {
 			'emoteID' : emoteid,
 		});
 	});
-	
+
 	return items;
 }
 

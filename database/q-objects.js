@@ -20,15 +20,17 @@ class QResult {
  */
 class QError {
 	/**
-	 *
-	 * @param {string} message
-	 * @param {string} brief
-	 * @param {number} code
+	 * Initializes a QError Object.
+	 * @param {Error} error PgError thrown during a pg query.
 	 */
-	constructor(message, brief, code) {
+	constructor(error) {
+		let end = error.stack.indexOf('\n');
+		let brief = error.stack.substring(7, end);
+		let message = 'Error ' + error.code + ': ' + brief;
+
 		this.message = message;
 		this.brief = brief;
-		this.code = code;
+		this.code = parseInt(error.code);
 	}
 }
 
