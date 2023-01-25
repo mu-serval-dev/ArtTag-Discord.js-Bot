@@ -1,5 +1,5 @@
 /** Module for retrieving links from the database given an emote tag search key */
-const { pool } = require('./client');
+const { pool } = require('./pool');
 const format = require('pg-format');
 const { QResult, QError } = require('./q-objects.js');
 
