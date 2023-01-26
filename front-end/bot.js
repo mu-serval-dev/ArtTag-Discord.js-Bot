@@ -1,6 +1,7 @@
 const { token } = require('../config.json');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { parseLink } = require('./link-parser');
+const { NoticeMessage } = require('pg-protocol/dist/messages');
 
 // Object to hold links in reactions for testing purposes
 const links = {};
@@ -37,8 +38,12 @@ client.on('messageCreate', msg => {
 
 		// Replies with link stored for given emote
 		if (Object.hasOwn(links, msg.content)) {
-			console.log(links[msg.content]);
-			msg.reply(links[msg.content]);
+			const embed = {
+				title : 'A Title',
+				url : links[msg.content],
+			};
+
+			msg.reply({ embeds : [embed] });
 		}
 	}
 
@@ -50,6 +55,9 @@ client.on('guildCreate', guild => {
 
 	// TODO: when bot joins a new guild, make a new table for that guild
 });
+
+// TODO: handle animated emotes that have 'a' at the beginning
+// TODO: figure out how to embed images? need to get actual image link through api...
 
 // On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
