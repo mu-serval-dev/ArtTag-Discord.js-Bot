@@ -36,6 +36,11 @@ client.on('messageCreate', msg => {
 	if (!msg.author.bot) {
 		console.log(msg.content);
 
+		// msg.embeds[0]? msg.reply(msg.embeds[0].image.url): msg.reply("No embed");
+		// const receivedEmbed = msg.embeds[0];
+		msg.reply(msg.embeds[0].image.url);
+		// NOTE: does NOT work for fxtwitter messages; need to figure out how to wait
+
 		// Replies with link stored for given emote
 		if (Object.hasOwn(links, msg.content)) {
 			const embed = {
@@ -44,6 +49,7 @@ client.on('messageCreate', msg => {
 			};
 
 			msg.reply({ embeds : [embed] });
+
 		}
 	}
 
