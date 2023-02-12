@@ -34,23 +34,25 @@ client.once(Events.ClientReady, c => {
 // On MessageCreate
 client.on('messageCreate', msg => {
 	if (!msg.author.bot) {
-		console.log(msg.content);
 
-		// msg.embeds[0]? msg.reply(msg.embeds[0].image.url): msg.reply("No embed");
-		// const receivedEmbed = msg.embeds[0];
-		msg.reply(msg.embeds[0].image.url);
-		// NOTE: does NOT work for fxtwitter messages; need to figure out how to wait
+		msg.reply(msg.embeds[0].thumbnail.url); // Works for fxtwitter
+		// msg.reply(msg.embeds[0].image.url); // Works for twitter
+		
+
+		/** Idea: store image url (can be for just a picture attachment or an embed) along
+		 * with artist / source data
+		 */
 
 		// Replies with link stored for given emote
-		if (Object.hasOwn(links, msg.content)) {
-			const embed = {
-				title : 'A Title',
-				url : links[msg.content],
-			};
+		// if (Object.hasOwn(links, msg.content)) {
+		// 	const embed = {
+		// 		title : 'A Title',
+		// 		url : links[msg.content],
+		// 	};
 
-			msg.reply({ embeds : [embed] });
+		// 	msg.reply({ embeds : [embed] });
 
-		}
+		// }
 	}
 
 });
