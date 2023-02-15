@@ -35,9 +35,23 @@ client.once(Events.ClientReady, c => {
 client.on('messageCreate', msg => {
 	if (!msg.author.bot) {
 
-		msg.reply(msg.embeds[0].thumbnail.url); // Works for fxtwitter
+		// NOTE: sometimes links embed a little too slow to catch (i.e., vxtwitter, fxtwitter)
+		// but this might be ok if they are only scraped when an emote is added
+		if (msg.embeds[0]) {
+			if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
+				msg.reply(msg.embeds[0].thumbnail.url);
+			}
+			else if (msg.embeds[0].image && msg.embeds[0].image.url) {
+				msg.reply(msg.embeds[0].image.url);
+			}
+		}
+		else if (msg.attachments[0] && msg.attachments[0].url) {
+			msg.reply(msg.attachments[0].url);
+		}
+
+		// msg.reply(msg.embeds[0].thumbnail.url); // Works for fxtwitter
 		// msg.reply(msg.embeds[0].image.url); // Works for twitter
-		
+
 
 		/** Idea: store image url (can be for just a picture attachment or an embed) along
 		 * with artist / source data
