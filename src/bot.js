@@ -14,85 +14,53 @@ const client = new Client({
 		GatewayIntentBits.MessageContent,
 		GatewayIntentBits.GuildMessageReactions,
 		GatewayIntentBits.GuildEmojisAndStickers,
-	] });
-
-
-// Wait for client to be ready
-client.once(Events.ClientReady, c => {
-	console.log(`Ready! Logged in as ${c.user.tag}`);
+	],
 });
 
 // #region Add Listeners
 
-// TODO: add query listeners
-// TODO: handle possible errors
-// 1. A provided emote is not in the database
-// 2. There is no artlink with the given emote tag in the database
-// Note: 2 should technically not be possible with how insertions are handled, but it might
-// be nice to handle in the case deletions/decrements are added later
-
-// On MessageCreate
-client.on('messageCreate', msg => {
-	if (!msg.author.bot) {
-
-		// NOTE: sometimes links embed a little too slow to catch (i.e., vxtwitter, fxtwitter)
-		// but this might be ok if they are only scraped when an emote is added
-		if (msg.embeds[0]) {
-			if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
-				msg.reply(msg.embeds[0].thumbnail.url);
-			}
-			else if (msg.embeds[0].image && msg.embeds[0].image.url) {
-				msg.reply(msg.embeds[0].image.url);
-			}
-		}
-		else if (msg.attachments[0] && msg.attachments[0].url) {
-			msg.reply(msg.attachments[0].url);
-		}
-
-		// msg.reply(msg.embeds[0].thumbnail.url); // Works for fxtwitter
-		// msg.reply(msg.embeds[0].image.url); // Works for twitter
-
-
-		/** Idea: store image url (can be for just a picture attachment or an embed) along
-		 * with artist / source data
-		 */
-
-		// Replies with link stored for given emote
-		// if (Object.hasOwn(links, msg.content)) {
-		// 	const embed = {
-		// 		title : 'A Title',
-		// 		url : links[msg.content],
-		// 	};
-
-		// 	msg.reply({ embeds : [embed] });
-
-		// }
-	}
-
+client.once(Events.ClientReady, c => {
+	console.log(`Ready! Logged in as ${c.user.tag}`);
 });
+
+client.on('messageCreate', msg => {
+	// TODO: add query listeners
+	// TODO: handle possible errors
+	// 1. A provided emote is not in the database
+	// 2. There is no artlink with the given emote tag in the database
+	// Note: 2 should technically not be possible with how insertions are handled, but it might
+	// be nice to handle in the case deletions/decrements are added later
+});
+
 
 // On GuildCreate
 client.on('guildCreate', guild => {
-	console.log('joined a new guild!');
+	console.log(`Joined a new guild ${guild.name}`);
 
 	// TODO: when bot joins a new guild, make a new table for that guild
 });
 
-// TODO: handle animated emotes that have 'a' at the beginning
-// TODO: figure out how to embed images? need to get actual image link through api...
-
 // On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
-	const match = parseLink(rctn.message.content);
+	if (!rctn.message.author.bot) {
 
-	if (!rctn.message.author.bot && match) {
+		const msg = rctn.message;
+
 		// "Built in" emojis don't need the <:>
 		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
-		links[emoji] = match;
+		// TODO: handle animated emotes that have 'a' at the beginning
 
-		// TODO: remove debug statements
-		rctn.message.reply(match);
-		// console.log(JSON.stringify(links));
+		if (msg.embeds[0]) {
+			if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
+				msg.reply(msg.embeds[0].thumbnail.url + ' ' + emoji);
+			}
+			else if (msg.embeds[0].image && msg.embeds[0].image.url) {
+				msg.reply(msg.embeds[0].image.url + ' ' + emoji);
+			}
+		}
+		else if (msg.attachments[0] && msg.attachments[0].url) {
+			msg.reply(msg.attachments[0].url + ' ' + emoji);
+		}
 	}
 });
 
