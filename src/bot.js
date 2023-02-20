@@ -42,10 +42,12 @@ client.on('guildCreate', guild => {
 
 // On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
+	const msg = rctn.message;
+	// const emoji = msg.guild.emojis.cache.get(rctn.emoji.id);
+	// console.log(emoji);
+
+
 	if (!rctn.message.author.bot) {
-
-		const msg = rctn.message;
-
 		// "Built in" emojis don't need the <:>
 		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
 		// TODO: handle animated emotes that have 'a' at the beginning
