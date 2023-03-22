@@ -52,17 +52,35 @@ client.on('messageReactionAdd', rctn => {
 		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
 		// TODO: handle animated emotes that have 'a' at the beginning
 
+		// console.log(msg);
+
 		if (msg.embeds[0]) {
 			if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
 				msg.reply(msg.embeds[0].thumbnail.url + ' ' + emoji);
+				console.log('embeds[0].thumbnail');
 			}
 			else if (msg.embeds[0].image && msg.embeds[0].image.url) {
 				msg.reply(msg.embeds[0].image.url + ' ' + emoji);
+				console.log('embeds[0].image');
 			}
 		}
-		else if (msg.attachments[0] && msg.attachments[0].url) {
-			msg.reply(msg.attachments[0].url + ' ' + emoji);
+		else if (msg.attachments.size > 0) {
+			// TODO: just for loop over map, gathering attachment links
+			const arr = Array.from(msg.attachments); // attachments is a map
+			const first_attach = arr[0][1]; // Object containing attachment data
+			// console.log(arr[0][1].attachment);
+			if (first_attach.attachment) {
+				msg.reply(first_attach.attachment + ' ' + emoji);
+				console.log('attach.attachment');
+			}
+			else if (first_attach.url) {
+				msg.reply(first_attach.url + ' ' + emoji);
+				console.log('attach.url');
+			}
+			// attachment links can expire if the original image is deleted :(
+			// unsure how to address
 		}
+		// TODO: can't handle image file that is uploaded
 	}
 });
 
