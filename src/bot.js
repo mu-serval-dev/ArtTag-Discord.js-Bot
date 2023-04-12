@@ -1,7 +1,5 @@
 const { token } = require('../config.json');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
-const { parseLink } = require('./link-parser');
-const { NoticeMessage } = require('pg-protocol/dist/messages');
 
 // Object to hold links in reactions for testing purposes
 const links = {};
@@ -16,6 +14,34 @@ const client = new Client({
 		GatewayIntentBits.GuildEmojisAndStickers,
 	],
 });
+
+/**
+ * Returns the first embed link in the given message, if possible.
+ * @param {Message} msg Message to retrieve link from
+ * @returns The string url for the first embed in the given Message, or null
+ */
+function retrieveEmbedLink(msg) {
+	if (msg.embeds[0]) {
+		if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
+			return msg.embeds[0].thumbnail.url;
+		}
+		else if (msg.embeds[0].image && msg.embeds[0].image.url) {
+			return msg.embeds[0].image.url;
+		}
+	}
+	else if (msg.attachments.size > 0) {
+		// TODO: just for loop over map, gathering attachment links
+		const arr = Array.from(msg.attachments); // attachments is a map
+		const first_attach = arr[0][1]; // Object containing attachment data
+		if (first_attach.attachment) {
+			return first_attach.attachment;
+		}
+		else if (first_attach.url) {
+			return first_attach.url;
+		}
+	}
+	return null;
+}
 
 // #region Add Listeners
 
@@ -52,35 +78,8 @@ client.on('messageReactionAdd', rctn => {
 		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
 		// TODO: handle animated emotes that have 'a' at the beginning
 
-		// console.log(msg);
-
-		if (msg.embeds[0]) {
-			if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
-				msg.reply(msg.embeds[0].thumbnail.url + ' ' + emoji);
-				console.log('embeds[0].thumbnail');
-			}
-			else if (msg.embeds[0].image && msg.embeds[0].image.url) {
-				msg.reply(msg.embeds[0].image.url + ' ' + emoji);
-				console.log('embeds[0].image');
-			}
-		}
-		else if (msg.attachments.size > 0) {
-			// TODO: just for loop over map, gathering attachment links
-			const arr = Array.from(msg.attachments); // attachments is a map
-			const first_attach = arr[0][1]; // Object containing attachment data
-			// console.log(arr[0][1].attachment);
-			if (first_attach.attachment) {
-				msg.reply(first_attach.attachment + ' ' + emoji);
-				console.log('attach.attachment');
-			}
-			else if (first_attach.url) {
-				msg.reply(first_attach.url + ' ' + emoji);
-				console.log('attach.url');
-			}
-			// attachment links can expire if the original image is deleted :(
-			// unsure how to address
-		}
-		// TODO: can't handle image file that is uploaded
+		const embedLink = retrieveEmbedLink(msg);
+		if (embedLink) { msg.reply(embedLink + ' ' + emoji);}
 	}
 });
 
