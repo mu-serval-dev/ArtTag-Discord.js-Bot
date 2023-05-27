@@ -30,7 +30,7 @@ class QError {
 
 		this.message = message;
 		this.brief = brief;
-		this.code = parseInt(error.code);
+		this.code = error.code;
 	}
 }
 

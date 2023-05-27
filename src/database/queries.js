@@ -30,9 +30,9 @@ async function select(guildID, emoteID) {
 }
 
 /**
- * Parses the string members of an array of objects
- * returned from a select query into a cleaner object
- * form containing the artlink, emoteCount, and emoteID.
+ * Parses the string rows returned from a select query into 
+ * a cleaner object form containing the artlink, emoteCount, 
+ * and emoteID.
  *
  * @param {Array} rows Array of objects with row string fields.
  * @param {string} emoteid ID of emote that was queried.
@@ -99,11 +99,13 @@ async function insert(guildID, emoteID, link) {
 		await client.query('COMMIT');
 
 		// TODO: return new QResult
-		return res;
+		//return res;
+		return new QResult(res.rows, res.rowCount);
 	}
 	catch (err) {
 		await client.query('ROLLBACK');
-		throw err;
+		//throw err;
+		throw new QError(err);
 		// TODO: throw new QError
 	}
 	finally {
@@ -114,7 +116,7 @@ async function insert(guildID, emoteID, link) {
 // NOTE: main source of err should be incorrect guildID, in which case a new table
 // for the guild should be made
 // TODO: remove example insert() call
-// insert('artlinks', 'emoji69', 'www.iamalinklookatme.com').then(res => {
+// insert('artlinks', 'emoji1', 'www.iamalinklookatme.com').then(res => {
 // 	console.log(res);
 // }).catch(err => {
 // 	console.log(err);
