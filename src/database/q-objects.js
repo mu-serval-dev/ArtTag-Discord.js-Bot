@@ -11,6 +11,7 @@ class QResult {
 	constructor(rows, rowCount) {
 		this.rows = rows;
 		this.rowCount = rowCount;
+		// TODO: add fields that matter for insertion transactions?
 	}
 }
 

@@ -1,26 +1,34 @@
 /** Module for retrieving links from the database given an emote tag search key */
 const { pool } = require('./pool');
 const format = require('pg-format');
+const  { schema } = require('../../config.json')
 const { QResult, QError } = require('./q-objects.js');
+const { user } = require('pg/lib/defaults');
+
+// TODO: optimize these perhaps idk
 
 /**
  * Queries the database table guildID for
  * rows that contain at least 1 count of the column
  * emoteID and returns them.
  *
- * @param {string} guildID ID of guild table to query.
+ * @param {string} userID ID of the user whose table must be queried.
  * @param {string} emoteID ID of emote column to query.
  * @returns {QResult} An Object detailing the result of the query.
  * @throws {QError} If a query error occurs, most likely due to
  * guildID not identifying an existing table or emoteID not identifying
  * an existing column in that table.
  */
-async function select(guildID, emoteID) {
-	let q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
-		emoteID, guildID, emoteID, emoteID);
+async function select(userID, emoteID) {
+	let q = format('SET SCHEMA %I', schema); // boilerplate
 
 	try {
 		let r = await pool.query(q);
+
+		q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
+		emoteID, userID, emoteID, emoteID);
+		r = await pool.query(q);
+
 		let rows = cleanRows(r.rows, emoteID);
 		return new QResult(rows, r.rowCount);
 	}
@@ -63,60 +71,66 @@ function cleanRows(rows, emoteid) {
 // });
 
 /**
- * Runs a transaction to insert a new link in the
- * emoteID column of the table identified by guildID.
- * Increments the count of the emoteID column by 1
- * for the row of the given link.
+ * Runs a transaction to increment the counter for the emoteID
+ * column by 1 for the row containing link in the table specified by
+ * guildID.
  *
  * If emoteID does not already identify a column in the table,
  * one is created.
+ * 
+ * If there is no row with the given link already, one is inserted.
  *
- * @param {string} guildID Guild table to store link in.
+ * @param {string} userID ID of the user that reacted to this link, and the
+ * name of the table to insert a row in.
  * @param {string} emoteID Emote to increment count by 1.
  * @param {string} link Link to store.
- * @returns {QResult} An Object detailing the result of the transaction.
- * @throws {QError} If a query error occurs during the transaction,
- * most likely due to guildID not identifying an existing table.
+ * @returns {QResult} The transaction's result.
+ * @throws {QError} If a query error occurs during the transaction.
  */
-async function insert(guildID, emoteID, link) {
+async function insert(userID, emoteID, link) {
 	const client = await pool.connect();
 
 	try {
 		await client.query('BEGIN');
 
-		let q = format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS %I INTEGER NOT NULL DEFAULT 0',
-			guildID, emoteID);
+		let q = format('SET SCHEMA %L', schema); // boilerplate
 		let res = await client.query(q);
 
-		q = format('INSERT INTO %I(link) VALUES (%L) ON CONFLICT DO NOTHING',
-			guildID, link);
+		// Preemptively create user's artlink table if it doesn't exist
+		q = format('CREATE TABLE IF NOT EXISTS %I (link varchar PRIMARY KEY)', userID);
 		res = await client.query(q);
 
+		// Add new counter column for emote if it doesn't exist
+		q = format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS %I INTEGER NOT NULL DEFAULT 0',
+			userID, emoteID);
+		res = await client.query(q);
+
+		// Insert row with link if it is not already in the table
+		q = format('INSERT INTO %I(link) VALUES (%L) ON CONFLICT DO NOTHING',
+			userID, link);
+		res = await client.query(q);
+
+		// Increment the new emote counter for that link's row
 		q = format('UPDATE %I SET %I = %I + 1 WHERE link = %L',
-			guildID, emoteID, emoteID, link);
+			userID, emoteID, emoteID, link);
 		res = await client.query(q);
 
 		await client.query('COMMIT');
 
-		// TODO: return new QResult
-		//return res;
 		return new QResult(res.rows, res.rowCount);
 	}
 	catch (err) {
 		await client.query('ROLLBACK');
-		//throw err;
 		throw new QError(err);
-		// TODO: throw new QError
 	}
 	finally {
 		client.release();
 	}
 }
 
-// NOTE: main source of err should be incorrect guildID, in which case a new table
-// for the guild should be made
+
 // TODO: remove example insert() call
-// insert('artlinks', 'emoji1', 'www.iamalinklookatme.com').then(res => {
+// insert('274290974153244677', 'emoji1', 'www.iamalinklookatme.com').then(res => {
 // 	console.log(res);
 // }).catch(err => {
 // 	console.log(err);
