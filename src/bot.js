@@ -1,4 +1,5 @@
-const { token } = require('../config.json');
+const { token, prefix } = require('../config.json');
+const { getCommand } = require('./commands')
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 
 // Object to hold links in reactions for testing purposes
@@ -52,6 +53,19 @@ client.once(Events.ClientReady, c => {
 client.on('messageCreate', msg => {
 	// TODO: add query listeners
 	// TODO: handle possible errors
+	if (msg.author.bot || msg.content[0] !== prefix) {
+		return;
+	}
+
+	const command = msg.content.substring(1);
+	const toExec = getCommand(command);
+
+	if (toExec === undefined) {
+		return;
+	}
+
+	const res = toExec();
+	msg.reply(res);
 	// 1. A provided emote is not in the database
 	// 2. There is no artlink with the given emote tag in the database
 	// Note: 2 should technically not be possible with how insertions are handled, but it might
