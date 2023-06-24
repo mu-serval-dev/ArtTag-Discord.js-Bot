@@ -58,14 +58,13 @@ client.on('messageCreate', msg => {
 	}
 
 	const command = msg.content.substring(1);
-	const toExec = getCommand(command);
+	const executeCommand = getCommand(command); // get command's function
 
-	if (toExec === undefined) {
+	if (executeCommand === undefined) {
 		return;
 	}
 
-	const res = toExec();
-	msg.reply(res);
+	executeCommand(msg);
 	// 1. A provided emote is not in the database
 	// 2. There is no artlink with the given emote tag in the database
 	// Note: 2 should technically not be possible with how insertions are handled, but it might
