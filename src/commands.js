@@ -1,11 +1,32 @@
 const { getQuip } = require("./quips")
+const { pagination } = require('discord.js-pagination')
+const { EmbedBuilder } = require('discord.js');
+// const paginationEmbed = require("discord.js-pagination");
 
 /**
  * Returns helpful information about the bot.
+ * @param {*} msg User command message
  * @returns string Help string
  */
 function help(msg) {
     msg.reply(getQuip() + "\n```This bot sucks```")
+}
+
+/**
+ * Display embed list of artlinks saved under the
+ * given emote.
+ * @param {*} msg User command message
+ */
+function show(msg){
+    // TODO
+
+    const res = new EmbedBuilder();
+    //res.setAuthor("Wiggy");
+    res.setColor(0x0099ff);
+    res.setTitle("Wiggy")
+    res.setDescription("wiggy is cute")
+    res.setImage("https://cdn.discordapp.com/attachments/275847048647933952/1122348247390892062/PXL_20230624_194802311.jpg")
+    msg.reply({'embeds' : [res]});
 }
 
 // TODO: utilizing typescript here might be nice to 
@@ -18,7 +39,8 @@ function help(msg) {
  * functions.
  */
 const commands = {
-    "help" : help
+    "help" : help,
+    "show" : show
 }
 
 /**

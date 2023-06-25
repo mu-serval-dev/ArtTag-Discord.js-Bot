@@ -71,14 +71,6 @@ client.on('messageCreate', msg => {
 	// be nice to handle in the case deletions/decrements are added later
 });
 
-
-// On GuildCreate
-client.on('guildCreate', guild => {
-	console.log(`Joined a new guild ${guild.name}`);
-
-	// TODO: when bot joins a new guild, make a new table for that guild
-});
-
 // On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
 	const msg = rctn.message;
