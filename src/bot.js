@@ -63,8 +63,9 @@ client.on('messageCreate', msg => {
 	if (executeCommand === undefined) {
 		return;
 	}
-
+	
 	executeCommand(msg);
+	msg.author.username
 	// 1. A provided emote is not in the database
 	// 2. There is no artlink with the given emote tag in the database
 	// Note: 2 should technically not be possible with how insertions are handled, but it might

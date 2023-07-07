@@ -21,12 +21,15 @@ function show(msg){
     // TODO
 
     const res = new EmbedBuilder();
-    //res.setAuthor("Wiggy");
+    res.setAuthor({"name" : msg.author.username, "iconURL" : msg.author.avatarURL()});
     res.setColor(0x0099ff);
-    res.setTitle("Wiggy")
-    res.setDescription("wiggy is cute")
-    res.setImage("https://cdn.discordapp.com/attachments/275847048647933952/1122348247390892062/PXL_20230624_194802311.jpg")
+    //res.setTitle("Tagged with :nerd:");
+    res.setDescription(":nerd:") // can insert discord emoji
+    res.setFooter({"text" : "1 of 1"})
+    res.setImage("https://pbs.twimg.com/media/Fz6pTLyaQAELw6p.jpg")
     msg.reply({'embeds' : [res]});
+
+    // TODO: use action rows to add buttons
 }
 
 // TODO: utilizing typescript here might be nice to 
