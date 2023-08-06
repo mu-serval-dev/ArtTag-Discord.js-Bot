@@ -77,15 +77,13 @@ client.on('messageReactionAdd', rctn => {
 	const msg = rctn.message;
 	// const emoji = msg.guild.emojis.cache.get(rctn.emoji.id);
 	// console.log(emoji);
-
-
 	if (!rctn.message.author.bot) {
 		// "Built in" emojis don't need the <:>
-		const emoji = rctn.emoji.id ? '<:' + rctn.emoji.identifier + '>' : rctn.emoji.name;
+		const emoji = rctn.emoji;
 		// TODO: handle animated emotes that have 'a' at the beginning
 
 		const embedLink = retrieveEmbedLink(msg);
-		if (embedLink) { msg.reply(embedLink + ' ' + emoji);}
+		if (embedLink) { msg.reply(`${embedLink} ${emoji}`);}
 	}
 });
 
