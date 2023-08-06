@@ -1,6 +1,7 @@
 const { token, prefix } = require('../config.json');
 const { getCommand } = require('./commands')
 const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { insert } = require('./database/queries')
 
 // Object to hold links in reactions for testing purposes
 const links = {};
@@ -83,7 +84,23 @@ client.on('messageReactionAdd', rctn => {
 		// TODO: handle animated emotes that have 'a' at the beginning
 
 		const embedLink = retrieveEmbedLink(msg);
-		if (embedLink) { msg.reply(`${embedLink} ${emoji}`);}
+
+		if (embedLink) { 
+
+			console.log(`Guild ${rctn.message.guildId} --> link insert`)
+
+			try {
+				res = insert(rctn.message.guildId, rctn.emoji.toString(), embedLink) // NOTE: pivoted to using guildID as table name
+				console.log(`Inserted link`)
+			}
+			catch (err) {
+				console.log(err.message)
+			}
+
+			// TODO: update QResult object to be useful for insertion queries, or just remove it lol
+			
+			// msg.reply(`${embedLink} ${emoji}`);
+		}
 	}
 });
 

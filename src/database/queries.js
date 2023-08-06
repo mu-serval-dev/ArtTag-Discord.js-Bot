@@ -80,14 +80,13 @@ function cleanRows(rows, emoteid) {
  * 
  * If there is no row with the given link already, one is inserted.
  *
- * @param {string} userID ID of the user that reacted to this link, and the
- * name of the table to insert a row in.
+ * @param {string} guildID ID of the guild where this reaction took place.
  * @param {string} emoteID Emote to increment count by 1.
  * @param {string} link Link to store.
  * @returns {QResult} The transaction's result.
  * @throws {QError} If a query error occurs during the transaction.
  */
-async function insert(userID, emoteID, link) {
+async function insert(guildID, emoteID, link) {
 	const client = await pool.connect();
 
 	try {
@@ -97,22 +96,22 @@ async function insert(userID, emoteID, link) {
 		let res = await client.query(q);
 
 		// Preemptively create user's artlink table if it doesn't exist
-		q = format('CREATE TABLE IF NOT EXISTS %I (link varchar PRIMARY KEY)', userID);
+		q = format('CREATE TABLE IF NOT EXISTS %I (link varchar PRIMARY KEY)', guildID);
 		res = await client.query(q);
 
 		// Add new counter column for emote if it doesn't exist
 		q = format('ALTER TABLE %I ADD COLUMN IF NOT EXISTS %I INTEGER NOT NULL DEFAULT 0',
-			userID, emoteID);
+			guildID, emoteID);
 		res = await client.query(q);
 
 		// Insert row with link if it is not already in the table
 		q = format('INSERT INTO %I(link) VALUES (%L) ON CONFLICT DO NOTHING',
-			userID, link);
+			guildID, link);
 		res = await client.query(q);
 
 		// Increment the new emote counter for that link's row
 		q = format('UPDATE %I SET %I = %I + 1 WHERE link = %L',
-			userID, emoteID, emoteID, link);
+			guildID, emoteID, emoteID, link);
 		res = await client.query(q);
 
 		await client.query('COMMIT');
