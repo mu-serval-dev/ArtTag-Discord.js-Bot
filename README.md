@@ -9,7 +9,5 @@ The goal of this bot is to provide a tagging function such that a discord server
 ###  Tools
 - PostgreSQL for Link Database
 - Discord.js Discord API wrapper
-- Javascript (duh)
-
-*Yes I know this is no fancy README at the moment, but be assured that this will get updated to be nicer once the bot actually has some nice functionality. Class work for my systems class and other life things have kept me busy recently, but I want to finish this and it should not take too long. Working front-end connected to back-end eta May 2024.*
+- Javascript
 
