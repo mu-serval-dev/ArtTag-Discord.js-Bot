@@ -1,5 +1,5 @@
 /**
- * Object returned when a PostGres Database
+ * Object returned when a Postgres Database
  * query is completed.
  */
 class QResult {
@@ -17,7 +17,7 @@ class QResult {
 
 /**
  * Object thrown when an error is encountered
- * while querying a PostGres Database.
+ * while querying a Postgres Database.
  */
 class QError {
 	/**
