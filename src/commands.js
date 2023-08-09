@@ -1,33 +1,61 @@
 const { getQuip } = require("./quips")
+const { select } = require("./database/queries")
 const { pagination } = require('discord.js-pagination')
 const { EmbedBuilder } = require('discord.js');
 // const paginationEmbed = require("discord.js-pagination");
 
 /**
  * Returns helpful information about the bot.
- * @param {*} msg User command message
+ * @param {Message<boolean>} msg User command message
+ * @param {Array<string>} bits User command message split into an array around spaces
  * @returns string Help string
  */
-function help(msg) {
+function help(msg, bits) {
     msg.reply(getQuip() + "\n```This bot sucks```")
 }
 
 /**
  * Display embed list of artlinks saved under the
  * given emote.
- * @param {*} msg User command message
+ * @param {Message<boolean>} msg User command message
+ * @param {Array<string>} bits User command message split into an array around spaces
  */
-function show(msg){
+function show(msg, bits){
     // TODO
 
-    const res = new EmbedBuilder();
-    res.setAuthor({"name" : msg.author.username, "iconURL" : msg.author.avatarURL()});
-    res.setColor(0x0099ff);
-    //res.setTitle("Tagged with :nerd:");
-    res.setDescription(":nerd:") // can insert discord emoji
-    res.setFooter({"text" : "1 of 1"})
-    res.setImage("https://pbs.twimg.com/media/Fz6pTLyaQAELw6p.jpg")
-    msg.reply({'embeds' : [res]});
+    if (bits.length < 2) {
+        msg.reply("Sorry, I need an emoji to retrieve your collection.")
+        return;
+    }
+
+    const emoji = bits[1]
+    const guildID = msg.guildId
+
+    // msg.reply(`Is this your emoji? ${emoji}`)
+
+    console.log(`Guild ${guildID} -> link select with emoji ${emoji}`)
+
+    select(guildID, emoji).then(res => {
+        console.log(res)
+
+        const link = res.rows[0].link
+        msg.reply(`Here you go! ${link}`)
+    }).catch(err => {
+        if (err.code == 42703) { // Column doesn't exist
+            msg.reply("Hmm... it looks like that emoji hasn't been used yet.")
+        }
+        console.log(err.message)
+    })
+    
+
+    // const res = new EmbedBuilder();
+    // res.setAuthor({"name" : msg.author.username, "iconURL" : msg.author.avatarURL()});
+    // res.setColor(0x0099ff);
+    // //res.setTitle("Tagged with :nerd:");
+    // res.setDescription(":nerd:") // can insert discord emoji
+    // res.setFooter({"text" : "1 of 1"})
+    // res.setImage("https://pbs.twimg.com/media/Fz6pTLyaQAELw6p.jpg")
+    // msg.reply({'embeds' : [res]});
 
     // TODO: use action rows to add buttons
 }
