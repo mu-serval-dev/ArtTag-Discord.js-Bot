@@ -12,21 +12,21 @@ const { user } = require('pg/lib/defaults');
  * rows that contain at least 1 count of the column
  * emoteID and returns them.
  *
- * @param {string} userID ID of the user whose table must be queried.
+ * @param {string} guildID ID of the server whose table must be queried.
  * @param {string} emoteID ID of emote column to query.
  * @returns {QResult} An Object detailing the result of the query.
  * @throws {QError} If a query error occurs, most likely due to
  * guildID not identifying an existing table or emoteID not identifying
  * an existing column in that table.
  */
-async function select(userID, emoteID) {
-	let q = format('SET SCHEMA %I', schema); // boilerplate
+async function select(guildID, emoteID) {
+	let q = format('SET SCHEMA %L', schema);
 
 	try {
 		let r = await pool.query(q);
 
 		q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
-		emoteID, userID, emoteID, emoteID);
+		emoteID, guildID, emoteID, emoteID);
 		r = await pool.query(q);
 
 		let rows = cleanRows(r.rows, emoteID);

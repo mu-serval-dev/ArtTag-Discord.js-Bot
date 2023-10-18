@@ -52,21 +52,27 @@ client.once(Events.ClientReady, c => {
 });
 
 client.on('messageCreate', msg => {
-	// TODO: add query listeners
-	// TODO: handle possible errors
+	// Ignore if message is sent by a bot or does not start with prefix
 	if (msg.author.bot || msg.content[0] !== prefix) {
 		return;
 	}
 
-	const command = msg.content.substring(1);
-	const executeCommand = getCommand(command); // get command's function
+	bits = msg.content.substring(1).split(" ")
 
-	if (executeCommand === undefined) {
+	if (bits.length == 0) {
+		return;
+	}
+
+
+	const commandName = bits[0];
+	const command = getCommand(commandName); // get command's function
+
+	if (command === undefined) {
 		return;
 	}
 	
-	executeCommand(msg);
-	msg.author.username
+	command(msg, bits);
+	
 	// 1. A provided emote is not in the database
 	// 2. There is no artlink with the given emote tag in the database
 	// Note: 2 should technically not be possible with how insertions are handled, but it might
@@ -86,20 +92,16 @@ client.on('messageReactionAdd', rctn => {
 		const embedLink = retrieveEmbedLink(msg);
 
 		if (embedLink) { 
+			console.log(`Guild ${rctn.message.guildId} -> link ${embedLink}`)
 
-			console.log(`Guild ${rctn.message.guildId} --> link insert`)
-
-			try {
-				res = insert(rctn.message.guildId, rctn.emoji.toString(), embedLink) // NOTE: pivoted to using guildID as table name
-				console.log(`Inserted link`)
-			}
-			catch (err) {
+			insert(rctn.message.guildId, rctn.emoji.toString(), embedLink).then(res => {
+				console.log(`Inserted link ${res}`)
+			})
+			.catch (err => {
 				console.log(err.message)
-			}
+			})
 
 			// TODO: update QResult object to be useful for insertion queries, or just remove it lol
-			
-			// msg.reply(`${embedLink} ${emoji}`);
 		}
 	}
 });
