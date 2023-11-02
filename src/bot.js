@@ -1,7 +1,7 @@
 const { token, prefix } = require('../config.json');
-const { getCommand } = require('./commands')
+const { getCommand } = require('./commands');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
-const { insert } = require('./database/queries')
+const { insert } = require('./database/queries');
 
 // Object to hold links in reactions for testing purposes
 const links = {};
@@ -57,7 +57,7 @@ client.on('messageCreate', msg => {
 		return;
 	}
 
-	bits = msg.content.substring(1).split(" ")
+	bits = msg.content.substring(1).split(' ');
 
 	if (bits.length == 0) {
 		return;
@@ -70,9 +70,9 @@ client.on('messageCreate', msg => {
 	if (command === undefined) {
 		return;
 	}
-	
+
 	command(msg, bits);
-	
+
 	// 1. A provided emote is not in the database
 	// 2. There is no artlink with the given emote tag in the database
 	// Note: 2 should technically not be possible with how insertions are handled, but it might
@@ -91,15 +91,15 @@ client.on('messageReactionAdd', rctn => {
 
 		const embedLink = retrieveEmbedLink(msg);
 
-		if (embedLink) { 
-			console.log(`Guild ${rctn.message.guildId} -> link ${embedLink}`)
+		if (embedLink) {
+			console.log(`Guild ${rctn.message.guildId} -> link ${embedLink}`);
 
 			insert(rctn.message.guildId, rctn.emoji.toString(), embedLink).then(res => {
-				console.log(`Inserted link ${res}`)
+				console.log(`Inserted link ${res}`);
 			})
-			.catch (err => {
-				console.log(err.message)
-			})
+				.catch (err => {
+					console.log(err.message);
+				});
 
 			// TODO: update QResult object to be useful for insertion queries, or just remove it lol
 		}
