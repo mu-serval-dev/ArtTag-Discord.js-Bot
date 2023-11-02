@@ -23,6 +23,9 @@ const client = new Client({
  * @returns The string url for the first embed in the given Message, or null
  */
 function retrieveEmbedLink(msg) {
+	// TODO: should these be exclusive? figure that out. i think
+	// there may be duplicates in embeds and attachments thingy.
+	// may be best to just add 1st image.
 	if (msg.embeds[0]) {
 		if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
 			return msg.embeds[0].thumbnail.url;
