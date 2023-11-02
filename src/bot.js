@@ -34,6 +34,7 @@ function retrieveEmbedLink(msg) {
 	else if (msg.attachments.size > 0) {
 		// TODO: just for loop over map, gathering attachment links
 		const arr = Array.from(msg.attachments); // attachments is a map
+
 		const first_attach = arr[0][1]; // Object containing attachment data
 		if (first_attach.attachment) {
 			return first_attach.attachment;
@@ -57,51 +58,39 @@ client.on('messageCreate', msg => {
 		return;
 	}
 
-	bits = msg.content.substring(1).split(' ');
-
+	const bits = msg.content.substring(1).split(' ');
 	if (bits.length == 0) {
 		return;
 	}
 
-
 	const commandName = bits[0];
-	const command = getCommand(commandName); // get command's function
+	const command = getCommand(commandName);
 
-	if (command === undefined) {
+	if (!command) {
 		return;
 	}
 
 	command(msg, bits);
-
-	// 1. A provided emote is not in the database
-	// 2. There is no artlink with the given emote tag in the database
-	// Note: 2 should technically not be possible with how insertions are handled, but it might
-	// be nice to handle in the case deletions/decrements are added later
 });
 
 // On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
+	// TODO: update to use slash commands instead
 	const msg = rctn.message;
-	// const emoji = msg.guild.emojis.cache.get(rctn.emoji.id);
-	// console.log(emoji);
-	if (!rctn.message.author.bot) {
-		// "Built in" emojis don't need the <:>
-		const emoji = rctn.emoji;
-		// TODO: handle animated emotes that have 'a' at the beginning
 
+	if (!rctn.message.author.bot) {
 		const embedLink = retrieveEmbedLink(msg);
 
 		if (embedLink) {
-			console.log(`Guild ${rctn.message.guildId} -> link ${embedLink}`);
+			console.log(`Inserting ${embedLink}\n\tinto guild ${rctn.message.guildId}\n\twith emoji ${rctn.emoji.toString()}`);
 
-			insert(rctn.message.guildId, rctn.emoji.toString(), embedLink).then(res => {
-				console.log(`Inserted link ${res}`);
-			})
+			insert(rctn.message.guildId, rctn.emoji.toString(), embedLink)
+				.then(res => {
+					console.log('\tDone! ✔');
+				})
 				.catch (err => {
-					console.log(err.message);
+					console.log('\tCould not insert link to database ❌' + '\n\t\t' + err.message);
 				});
-
-			// TODO: update QResult object to be useful for insertion queries, or just remove it lol
 		}
 	}
 });

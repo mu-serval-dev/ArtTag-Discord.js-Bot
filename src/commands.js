@@ -11,42 +11,21 @@ const { EmbedBuilder } = require('discord.js');
  * @returns string Help string
  */
 function help(msg, bits) {
-	msg.reply(getQuip() + '\n```This bot sucks```');
+	msg.reply(getQuip() + '\n```My name is ArtBot and I do things!\nConsider me your personal butler for saving art...```');
 }
 
 /**
- * Display embed list of artlinks saved under the
- * given emote.
- * @param {Message<boolean>} msg User command message
- * @param {Array<string>} bits User command message split into an array around spaces
+ * Replies to msg with the links contained in rows.
+ * @param {String} msg Original command message.
+ * @param {Array} rows Array of art links from db.
  */
-function show(msg, bits) {
-	// TODO
+function displayLinks(msg, rows) {
+	let response = [];
 
-	if (bits.length < 2) {
-		msg.reply('Sorry, I need an emoji to retrieve your collection.');
-		return;
+	// TODO: sort links based on emote count
+	for (let i = 0; i < rows.length; i++) {
+		response.push(rows[i].link);
 	}
-
-	const emoji = bits[1];
-	const guildID = msg.guildId;
-
-	// msg.reply(`Is this your emoji? ${emoji}`)
-
-	console.log(`Guild ${guildID} -> link select with emoji ${emoji}`);
-
-	select(guildID, emoji).then(res => {
-		console.log(res);
-
-		const link = res.rows[0].link;
-		msg.reply(`Here you go! ${link}`);
-	}).catch(err => {
-		if (err.code == 42703) { // Column doesn't exist
-			msg.reply('Hmm... it looks like that emoji hasn\'t been used yet.');
-		}
-		console.log(err.message);
-	});
-
 
 	// const res = new EmbedBuilder();
 	// res.setAuthor({"name" : msg.author.username, "iconURL" : msg.author.avatarURL()});
@@ -58,6 +37,39 @@ function show(msg, bits) {
 	// msg.reply({'embeds' : [res]});
 
 	// TODO: use action rows to add buttons
+
+	msg.reply(getQuip() + '\n' + response.join('\n'));
+}
+
+/**
+ * Display embed list of artlinks saved under the
+ * given emote.
+ * @param {Message<boolean>} msg User command message
+ * @param {Array<string>} bits User command message split into an array around spaces
+ */
+function show(msg, bits) {
+	if (bits.length < 2) {
+		msg.reply('Sorry, I need an emoji to retrieve your collection.');
+		return;
+	}
+
+	const emoji = bits[1];
+	const guildID = msg.guildId;
+
+	console.log(`Retrieving links from\n\tguild ${guildID}\n\twith emoji ${emoji}`);
+
+	select(guildID, emoji).then(res => {
+		displayLinks(msg, res.rows);
+		console.log('\tDone! ✔');
+		// console.log(res.rows);
+		// const link = res.rows[0].link;
+		// msg.reply(`Here you go! \n${link}`);
+	}).catch(err => {
+		if (err.code == 42703) { // Column doesn't exist
+			msg.reply('Hmm... it looks like that emoji hasn\'t been used yet.');
+		}
+		console.log('\tCould not retrieve links ❌' + '\n\t\t' + err.message);
+	});
 }
 
 // TODO: utilizing typescript here might be nice to

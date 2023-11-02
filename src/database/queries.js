@@ -1,9 +1,8 @@
 /** Module for retrieving links from the database given an emote tag search key */
 const { pool } = require('./pool');
 const format = require('pg-format');
-const  { schema } = require('../../config.json')
+const { schema } = require('../../config.json');
 const { QResult, QError } = require('./q-objects.js');
-const { user } = require('pg/lib/defaults');
 
 // TODO: optimize these perhaps idk
 
@@ -26,7 +25,7 @@ async function select(guildID, emoteID) {
 		let r = await pool.query(q);
 
 		q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
-		emoteID, guildID, emoteID, emoteID);
+			emoteID, guildID, emoteID, emoteID);
 		r = await pool.query(q);
 
 		let rows = cleanRows(r.rows, emoteID);
@@ -38,8 +37,8 @@ async function select(guildID, emoteID) {
 }
 
 /**
- * Parses the string rows returned from a select query into 
- * a cleaner object form containing the artlink, emoteCount, 
+ * Parses the string rows returned from a select query into
+ * a cleaner object form containing the artlink, emoteCount,
  * and emoteID.
  *
  * @param {Array} rows Array of objects with row string fields.
@@ -63,13 +62,6 @@ function cleanRows(rows, emoteid) {
 	return items;
 }
 
-// TODO: remove select() call
-// select('artlinks', 'emoji1').then(res => {
-// 	console.log(res);
-// }).catch(err => {
-// 	console.log(err);
-// });
-
 /**
  * Runs a transaction to increment the counter for the emoteID
  * column by 1 for the row containing link in the table specified by
@@ -77,7 +69,7 @@ function cleanRows(rows, emoteid) {
  *
  * If emoteID does not already identify a column in the table,
  * one is created.
- * 
+ *
  * If there is no row with the given link already, one is inserted.
  *
  * @param {string} guildID ID of the guild where this reaction took place.
@@ -92,7 +84,7 @@ async function insert(guildID, emoteID, link) {
 	try {
 		await client.query('BEGIN');
 
-		let q = format('SET SCHEMA %L', schema); // boilerplate
+		let q = format('SET SCHEMA %L', schema);
 		let res = await client.query(q);
 
 		// Preemptively create user's artlink table if it doesn't exist
@@ -126,14 +118,6 @@ async function insert(guildID, emoteID, link) {
 		client.release();
 	}
 }
-
-
-// TODO: remove example insert() call
-// insert('274290974153244677', 'emoji1', 'www.iamalinklookatme.com').then(res => {
-// 	console.log(res);
-// }).catch(err => {
-// 	console.log(err);
-// });
 
 
 exports.select = select;
