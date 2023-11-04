@@ -3,9 +3,6 @@ const { getCommand } = require('./commands');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { insert } = require('./database/queries');
 
-// Object to hold links in reactions for testing purposes
-const links = {};
-
 // Create new Client with Intents
 const client = new Client({
 	intents: [
@@ -18,39 +15,18 @@ const client = new Client({
 });
 
 /**
- * Returns the first embed link in the given message, if possible.
- * @param {Message} msg Message to retrieve link from
- * @returns The string url for the first embed in the given Message, or null
+ * Retrieves all image links in the given message.
+ * @param {Message} msg Message to retrieve links from.
+ * @returns An array of urls for all embed images / attachments in msg.
  */
-function retrieveEmbedLink(msg) {
-	// TODO: should these be exclusive? figure that out. i think
-	// there may be duplicates in embeds and attachments thingy.
-	// may be best to just add 1st image.
+function retrieveLinks(msg) {
+	let links = msg.embeds.map((embed) => embed.thumbnail.url);
 
-	console.log('embeds: ', msg.embeds);
-	console.log('attachments: ', msg.attachments);
+	msg.attachments.forEach((v, k) => {
+		links.push(v.url);
+	});
 
-	// if (msg.embeds[0]) {
-	// 	if (msg.embeds[0].thumbnail && msg.embeds[0].thumbnail.url) {
-	// 		return msg.embeds[0].thumbnail.url;
-	// 	}
-	// 	else if (msg.embeds[0].image && msg.embeds[0].image.url) {
-	// 		return msg.embeds[0].image.url;
-	// 	}
-	// }
-	// else if (msg.attachments.size > 0) {
-	// 	// TODO: just for loop over map, gathering attachment links
-	// 	const arr = Array.from(msg.attachments); // attachments is a map
-
-	// 	const first_attach = arr[0][1]; // Object containing attachment data
-	// 	if (first_attach.attachment) {
-	// 		return first_attach.attachment;
-	// 	}
-	// 	else if (first_attach.url) {
-	// 		return first_attach.url;
-	// 	}
-	// }
-	return null;
+	return links;
 }
 
 // #region Add Listeners
@@ -86,19 +62,20 @@ client.on('messageReactionAdd', rctn => {
 	const msg = rctn.message;
 
 	if (!rctn.message.author.bot) {
-		const embedLink = retrieveEmbedLink(msg);
+		const links = retrieveLinks(msg);
 
-		if (embedLink) {
-			console.log(`Inserting ${embedLink}\n\tinto guild ${rctn.message.guildId}\n\twith emoji ${rctn.emoji.toString()}`);
-
-			insert(rctn.message.guildId, rctn.emoji.toString(), embedLink)
-				.then(res => {
-					console.log('\tDone! ✔');
-				})
-				.catch (err => {
-					console.log('\tCould not insert link to database ❌' + '\n\t\t' + err.message);
-				});
+		if (links.length == 0) {
+			return;
 		}
+
+		console.log(`[INFO] Inserting ${links.length} links\n\tinto guild ${rctn.message.guildId}\n\twith emoji ${rctn.emoji.toString()}`);
+		insert(rctn.message.guildId, rctn.emoji.toString(), links)
+			.then(res => {
+				console.log('\tDone! ✔');
+			})
+			.catch (err => {
+				console.log('\t[ERR] Could not insert link to database ❌' + '\n\t\t' + err.message);
+			});
 	}
 });
 

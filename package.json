@@ -5,7 +5,7 @@
     "pg": "^8.8.0",
     "pg-format": "^1.0.4"
   },
-  "name": "discord",
+  "name": "art-tag-bot",
   "version": "1.0.0",
   "description": "Discord bot using discord.js",
   "main": "bot.js",

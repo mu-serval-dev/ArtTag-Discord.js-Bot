@@ -11,3 +11,11 @@ The goal of this bot is to provide a tagging function such that a discord server
 - Discord.js Discord API wrapper
 - Javascript
 
+### How To: Setup
+
+# config.json
+- bot token
+- dbstring
+- dbobj
+- schema
+- prefix

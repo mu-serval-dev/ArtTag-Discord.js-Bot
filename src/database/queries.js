@@ -74,12 +74,15 @@ function cleanRows(rows, emoteid) {
  *
  * @param {string} guildID ID of the guild where this reaction took place.
  * @param {string} emoteID Emote to increment count by 1.
- * @param {string} link Link to store.
+ * @param {string} links Array of string links to store.
  * @returns {QResult} The transaction's result.
  * @throws {QError} If a query error occurs during the transaction.
  */
-async function insert(guildID, emoteID, link) {
+async function insert(guildID, emoteID, links) {
 	const client = await pool.connect();
+
+	// links array must be nested to insert multiple rows at once
+	const links_nested = links.map(link => [link]);
 
 	try {
 		await client.query('BEGIN');
@@ -87,7 +90,7 @@ async function insert(guildID, emoteID, link) {
 		let q = format('SET SCHEMA %L', schema);
 		let res = await client.query(q);
 
-		// Preemptively create user's artlink table if it doesn't exist
+		// Preemptively create guild's table if it doesn't exist
 		q = format('CREATE TABLE IF NOT EXISTS %I (link varchar PRIMARY KEY)', guildID);
 		res = await client.query(q);
 
@@ -97,13 +100,13 @@ async function insert(guildID, emoteID, link) {
 		res = await client.query(q);
 
 		// Insert row with link if it is not already in the table
-		q = format('INSERT INTO %I(link) VALUES (%L) ON CONFLICT DO NOTHING',
-			guildID, link);
+		q = format('INSERT INTO %I(link) VALUES %L ON CONFLICT DO NOTHING',
+			guildID, links_nested);
 		res = await client.query(q);
 
 		// Increment the new emote counter for that link's row
-		q = format('UPDATE %I SET %I = %I + 1 WHERE link = %L',
-			guildID, emoteID, emoteID, link);
+		q = format('UPDATE %I SET %I = %I + 1 WHERE link IN (%L)',
+			guildID, emoteID, emoteID, links);
 		res = await client.query(q);
 
 		await client.query('COMMIT');
@@ -112,6 +115,7 @@ async function insert(guildID, emoteID, link) {
 	}
 	catch (err) {
 		await client.query('ROLLBACK');
+		console.log(err);
 		throw new QError(err);
 	}
 	finally {
