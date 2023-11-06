@@ -1,8 +1,10 @@
 const { getQuip } = require('./quips');
 const { select } = require('./database/queries');
-const { pagination } = require('discord.js-pagination');
+const { pagination } = require('@devraelfreeze/discordjs-pagination');
 const { EmbedBuilder } = require('discord.js');
 // const paginationEmbed = require("discord.js-pagination");
+const embed_timeout = 30000; // 30 seconds
+const max_interactions = 30;
 
 /**
  * Returns helpful information about the bot.
@@ -20,12 +22,34 @@ function help(msg, bits) {
  * @param {Array} rows Array of art links from db.
  */
 function displayLinks(msg, rows) {
-	let response = [];
-
-	// TODO: sort links based on emote count
-	for (let i = 0; i < rows.length; i++) {
-		response.push(rows[i].link);
+	if (rows.length == 0) {
+		msg.reply('Sorry, I couldn\'t find any links with that emoji.');
+		return;
 	}
+
+	let embeds = rows.map((x) => {
+		return new EmbedBuilder()
+			.setImage(x.link)
+			.setDescription(`${x.emoteID} ${x.emoteCount}`);
+	});
+
+	// todo: add custom filter
+	// todo: add custom buttons
+	const pagination_options = {
+		message : msg,
+		ephemeral : false,
+		embeds : embeds,
+		author : msg.member.user,
+		time : embed_timeout,
+		disableButtons : true,
+		fastSkip : false,
+		pageTravel : false,
+		max : max_interactions,
+	};
+
+	pagination(pagination_options);
+
+	// msg.reply({ 'content' : getQuip(), 'embeds' : embeds });
 
 	// const res = new EmbedBuilder();
 	// res.setAuthor({"name" : msg.author.username, "iconURL" : msg.author.avatarURL()});
@@ -35,40 +59,35 @@ function displayLinks(msg, rows) {
 	// res.setFooter({"text" : "1 of 1"})
 	// res.setImage("https://pbs.twimg.com/media/Fz6pTLyaQAELw6p.jpg")
 	// msg.reply({'embeds' : [res]});
-
-	// TODO: use action rows to add buttons
-
-	msg.reply(getQuip() + '\n' + response.join('\n'));
 }
 
 /**
  * Display embed list of artlinks saved under the
  * given emote.
  * @param {Message<boolean>} msg User command message
- * @param {Array<string>} bits User command message split into an array around spaces
+ * @param {Array<string>} pieces User command message split into an array around spaces
+ * @param
  */
-function show(msg, bits) {
-	if (bits.length < 2) {
+function show(msg, pieces) {
+	// TODO: take emoji as argument so we can build the embeds
+	if (pieces.length < 2) {
 		msg.reply('Sorry, I need an emoji to retrieve your collection.');
 		return;
 	}
 
-	const emoji = bits[1];
+	const emoji = pieces[1];
 	const guildID = msg.guildId;
 
-	console.log(`Retrieving links from\n\tguild ${guildID}\n\twith emoji ${emoji}`);
+	console.log(`[INFO] Retrieving links from guild ${guildID} with emoji ${emoji}`);
 
 	select(guildID, emoji).then(res => {
 		displayLinks(msg, res.rows);
-		console.log('\tDone! ✔');
-		// console.log(res.rows);
-		// const link = res.rows[0].link;
-		// msg.reply(`Here you go! \n${link}`);
+		console.log('[INFO] Done! ✔');
 	}).catch(err => {
 		if (err.code == 42703) { // Column doesn't exist
 			msg.reply('Hmm... it looks like that emoji hasn\'t been used yet.');
 		}
-		console.log('\tCould not retrieve links ❌' + '\n\t\t' + err.message);
+		console.log('[ERROR] Could not retrieve links ❌' + '\n\t' + err.message);
 	});
 }
 
