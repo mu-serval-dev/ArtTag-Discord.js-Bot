@@ -1,6 +1,4 @@
 const twit = new RegExp('https://(fx|vx|)twitter.com/\\S+/status/\\S+');
-const fa = new RegExp('https://www.furaffinity.net/view/\\S+/');
-const e6 = new RegExp('https://e621.net/posts/\\S+');
 
 /**
  * Finds and returns the first art post link in a string.
@@ -25,14 +23,6 @@ function parseLink(content) {
 		}
 
 		return link;
-	}
-
-	if (fa.test(content)) {
-		return fa.exec(content)[0];
-	}
-
-	if (e6.test(content)) {
-		return e6.exec(content)[0];
 	}
 
 	return null;
