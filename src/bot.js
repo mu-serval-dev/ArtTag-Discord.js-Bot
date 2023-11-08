@@ -32,7 +32,7 @@ function retrieveLinks(msg) {
 // #region Add Listeners
 
 client.once(Events.ClientReady, c => {
-	console.log(`Ready! Logged in as ${c.user.tag}`);
+	console.log(`[INFO] Ready! Logged in as ${c.user.tag}`);
 });
 
 client.on('messageCreate', msg => {
@@ -41,19 +41,19 @@ client.on('messageCreate', msg => {
 		return;
 	}
 
-	const bits = msg.content.substring(1).split(' ');
-	if (bits.length == 0) {
+	const pieces = msg.content.substring(1).split(' ');
+	if (pieces.length == 0) {
 		return;
 	}
 
-	const commandName = bits[0];
+	const commandName = pieces[0];
 	const command = getCommand(commandName);
 
 	if (!command) {
 		return;
 	}
 
-	command(msg, bits);
+	command(msg, pieces);
 });
 
 // On MessageReactionAdd
@@ -68,13 +68,13 @@ client.on('messageReactionAdd', rctn => {
 			return;
 		}
 
-		console.log(`[INFO] Inserting ${links.length} links\n\tinto guild ${rctn.message.guildId}\n\twith emoji ${rctn.emoji.toString()}`);
+		console.log(`[INFO] Inserting ${links.length} links into guild ${rctn.message.guildId} with emoji ${rctn.emoji.toString()}`);
 		insert(rctn.message.guildId, rctn.emoji.toString(), links)
 			.then(res => {
-				console.log('\tDone! ✔');
+				console.log('[INFO] Done! ✔');
 			})
 			.catch (err => {
-				console.log('\t[ERR] Could not insert link to database ❌' + '\n\t\t' + err.message);
+				console.log('[ERROR] Could not insert link to database ❌' + '\n\t' + err.message);
 			});
 	}
 });
