@@ -1,8 +1,7 @@
 const { getQuip } = require('./quips');
 const { select } = require('./database/queries');
 const { pagination } = require('@devraelfreeze/discordjs-pagination');
-const { EmbedBuilder } = require('discord.js');
-// const paginationEmbed = require("discord.js-pagination");
+const { EmbedBuilder, CommandInteraction } = require('discord.js');
 const embed_timeout = 30000; // 30 seconds
 const max_interactions = 30;
 
@@ -33,7 +32,12 @@ function displayLinks(msg, rows) {
 			.setDescription(`${x.emoteID} ${x.emoteCount}`);
 	});
 
-	// todo: add custom filter
+	// Only allow interaction initiator to navigate embed
+	const author_id = msg.author.id;
+	const cust_filter = (interaction) => {
+		return interaction.member.user.id == author_id;
+	};
+
 	// todo: add custom buttons
 	const pagination_options = {
 		message : msg,
@@ -45,20 +49,10 @@ function displayLinks(msg, rows) {
 		fastSkip : false,
 		pageTravel : false,
 		max : max_interactions,
+		customFilter : cust_filter,
 	};
 
 	pagination(pagination_options);
-
-	// msg.reply({ 'content' : getQuip(), 'embeds' : embeds });
-
-	// const res = new EmbedBuilder();
-	// res.setAuthor({"name" : msg.author.username, "iconURL" : msg.author.avatarURL()});
-	// res.setColor(0x0099ff);
-	// //res.setTitle("Tagged with :nerd:");
-	// res.setDescription(":nerd:") // can insert discord emoji
-	// res.setFooter({"text" : "1 of 1"})
-	// res.setImage("https://pbs.twimg.com/media/Fz6pTLyaQAELw6p.jpg")
-	// msg.reply({'embeds' : [res]});
 }
 
 /**
