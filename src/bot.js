@@ -1,6 +1,6 @@
-const { token, prefix } = require('../config.json');
+const { token, prefix, art_channel_id, bot_channel_id } = require('../config.json');
 const { getCommand } = require('./commands');
-const { Client, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Events, GatewayIntentBits, ActivityType } = require('discord.js');
 const { insert } = require('./database/queries');
 
 // Create new Client with Intents
@@ -32,12 +32,21 @@ function retrieveLinks(msg) {
 // #region Add Listeners
 
 client.once(Events.ClientReady, c => {
+	c.user.setPresence({
+		activities: [
+			{
+				name: `${prefix}help`,
+				type: ActivityType.Listening,
+			},
+		],
+		status: 'online',
+	});
 	console.log(`[INFO] Ready! Logged in as ${c.user.tag}`);
 });
 
 client.on('messageCreate', msg => {
 	// Ignore if message is sent by a bot or does not start with prefix
-	if (msg.author.bot || msg.content[0] !== prefix) {
+	if (msg.channelId !== bot_channel_id || msg.author.bot || msg.content[0] !== prefix) {
 		return;
 	}
 
@@ -58,6 +67,11 @@ client.on('messageCreate', msg => {
 
 // On MessageReactionAdd
 client.on('messageReactionAdd', rctn => {
+	// TODO: remove
+	if (rctn.message.channelId !== art_channel_id) {
+		return;
+	}
+
 	// TODO: update to use slash commands instead
 	const msg = rctn.message;
 

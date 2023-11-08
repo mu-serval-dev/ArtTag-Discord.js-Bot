@@ -70,7 +70,7 @@ function displayLinks(msg, rows) {
 function show(msg, pieces) {
 	// TODO: take emoji as argument so we can build the embeds
 	if (pieces.length < 2) {
-		msg.reply('Sorry, I need an emoji to retrieve your collection.');
+		msg.reply(`Sorry, I need an emoji to retrieve your collection.\n\`\`Usage: ${prefix}show <emoji>\`\``);
 		return;
 	}
 
