@@ -1,0 +1,15 @@
+{
+    "token": "<bot_token>",
+    "dbstring": "<pg_db_link>",
+    "dbobj" : {
+        "database": "<db_name>",
+        "user" : "<user_name>",
+        "password" : "<password>",
+        "port" : 9999,
+        "max" : 10,
+        "idleTimeoutMillis" : 1000,
+        "connectionTimeoutMillis" : 1000
+    },
+    "schema" : "<db_schema_name>",
+    "prefix" : "<command_prefix>"
+}
