@@ -32,7 +32,8 @@ async function select(guildID, emoteID) {
 		return new QResult(rows, r.rowCount);
 	}
 	catch (err) {
-		throw new QError(err);
+		console.log('ERROR');
+		throw new QError(err); // TODO: many errors here, check if fields exist first
 	}
 }
 
