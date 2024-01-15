@@ -19,9 +19,8 @@ const { QResult, QError } = require('./q-objects.js');
  * an existing column in that table.
  */
 async function select(guildID, emoteID) {
-	let q = format('SET SCHEMA %L', schema);
-
 	try {
+		let q = format('SET SCHEMA %L', schema);
 		let r = await pool.query(q);
 
 		q = format('SELECT (link, %I) from %I WHERE %I > 0 ORDER BY %I DESC',
@@ -32,8 +31,9 @@ async function select(guildID, emoteID) {
 		return new QResult(rows, r.rowCount);
 	}
 	catch (err) {
-		console.log('ERROR');
-		throw new QError(err); // TODO: many errors here, check if fields exist first
+		// console.log('ERROR');
+		// console.log(err);
+		throw new QError(err);
 	}
 }
 

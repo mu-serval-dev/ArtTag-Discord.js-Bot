@@ -80,13 +80,17 @@ function show(msg, pieces) {
 	console.log(`[INFO] Retrieving links from guild ${guildID} with emoji ${emoji}`);
 
 	select(guildID, emoji).then(res => {
-		displayLinks(msg, res.rows);
+		displayLinks(msg, res.rows); // THROWING ERROR HERE
 		console.log('[INFO] Done! ✔');
 	}).catch(err => {
+		// TODO: problem is an error in displayLinks call can go here too.
+		// check if error object is actually a QError.
 		if (err.code == 42703) { // Column doesn't exist
 			msg.reply('Hmm... it looks like that emoji hasn\'t been used yet.');
 		}
-		console.log('[ERROR] Could not retrieve links ❌' + '\n\t' + err.message);
+		console.log(err);
+
+		// console.log('[ERROR] Could not retrieve links ❌' + '\n\t' + err.message);
 	});
 }
 
