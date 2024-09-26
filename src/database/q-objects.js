@@ -1,3 +1,6 @@
+// TODO: change to .ts, use CTRL+SHIFT+B to run build task to
+// turn anything .ts/ files in src into js files in build/
+
 /**
  * Object returned when a Postgres Database
  * query is completed.

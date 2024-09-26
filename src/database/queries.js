@@ -5,6 +5,8 @@ const { schema } = require('../../config.json');
 const { QResult, QError } = require('./q-objects.js');
 
 // TODO: optimize these perhaps idk
+// TODO: change to .ts, use CTRL+SHIFT+B to run build task to
+// turn anything .ts/ files in src into js files in build/
 
 /**
  * Queries the database table guildID for

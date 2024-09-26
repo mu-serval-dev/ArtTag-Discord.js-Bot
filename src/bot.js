@@ -3,6 +3,9 @@ const { getCommand } = require('./commands');
 const { Client, Events, GatewayIntentBits, ActivityType } = require('discord.js');
 const { insert } = require('./database/queries');
 
+// TODO: change to .ts, use CTRL+SHIFT+B to run build task to
+// turn anything .ts/ files in src into js files in build/
+
 // Create new Client with Intents
 const client = new Client({
 	intents: [

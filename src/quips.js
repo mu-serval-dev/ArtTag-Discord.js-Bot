@@ -1,3 +1,6 @@
+// TODO: change to .ts, use CTRL+SHIFT+B to run build task to
+// turn anything .ts/ files in src into js files in build/
+
 const quips = [
 	'Here ya go!',
 	'I\'ll get that for ya!',

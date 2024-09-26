@@ -6,6 +6,9 @@ const { EmbedBuilder, CommandInteraction } = require('discord.js');
 const embed_timeout = 30000; // 30 seconds
 const max_interactions = 30;
 
+// TODO: change to .ts, use CTRL+SHIFT+B to run build task to
+// turn anything .ts/ files in src into js files in build/
+
 // TODO: move commands into separate files to cleanup this file
 // TODO: move this to a text file or indent it somehow
 const help_text = `\`\`\`Pleasure to meet you! My name is ArtBot and I'm your personal art collecting assistant! Here's some info about how I work:\n\nAnytime you or another server member reacts to an image attachment or embed with an emoji, that image is "tagged" with that emoji and is added to a server-wide collection of art that can be queried with the 'show' command. I also keep track of how many times an image has been tagged with a certain emoji, so you can see which image was most popular!\n\nCommands:\n'${prefix}help': display this help text\n'${prefix}show <emoji>': display a collection of images tagged with the given emoji\`\`\``;

@@ -1,18 +1,22 @@
 const https = require('https');
 const fs = require('fs');
 
+// TODO: change to .ts, use CTRL+SHIFT+B to run build task to
+// turn anything .ts/ files in src into js files in build/
+
 function download_image(url, download_path) {
 	const file = fs.createWriteStream(download_path);
 	const req = https.get(url, res => {
-		res.pipe(file);
-		// console.log(res.statusCode);
-		// console.log(res.headers['content-type']);
-		// res.pipe()
+		console.log(res.headers);
+		// res.pipe(file);
+		console.log(res.statusCode);
+		console.log(res.headers['content-type']);
+		// // res.pipe()
 
-		file.on('finish', () => {
-			file.close();
-			console.log('Downloaded file');
-		});
+		// file.on('finish', () => {
+		// 	file.close();
+		// 	console.log('Downloaded file');
+		// });
 	});
 }
 
