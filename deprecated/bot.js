@@ -1,7 +1,9 @@
-const { token, prefix } = require('../config.json');
-const { getCommand } = require('./commands');
-const { Client, Events, GatewayIntentBits } = require('discord.js');
-const { insert } = require('./database/queries');
+import { token, prefix } from '../config.json';
+import { getCommand } from './commands.js';
+import { Client, Events, GatewayIntentBits } from 'discord.js';
+import { insert } from './database/queries.js';
+
+// TODO: uh figure out how to specify this is a esm packagage module idk!!!
 
 // Create new Client with Intents
 const client = new Client({

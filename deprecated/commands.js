@@ -1,8 +1,11 @@
-const { getQuip } = require('./quips');
-const { select } = require('./database/queries');
-const { pagination } = require('@devraelfreeze/discordjs-pagination');
-const { prefix } = require('../config.json');
-const { EmbedBuilder, CommandInteraction } = require('discord.js');
+import { getQuip } from './quips.js';
+import { select } from './database/queries.js';
+import { pagination } from '@devraelfreeze/discordjs-pagination';
+import { prefix } from '../config.json';
+import { EmbedBuilder, CommandInteraction, Message } from 'discord.js';
+// import type { IconData, OmitPartialGroupDMChannel } from 'discord.js';
+
+
 const embed_timeout = 30000; // 30 seconds
 const max_interactions = 30;
 
@@ -11,14 +14,26 @@ const max_interactions = 30;
 const help_text = `\`\`\`Pleasure to meet you! My name is ArtBot and I'm your personal art collecting assistant! Here's some info about how I work:\n\nAnytime you or another server member reacts to an image attachment or embed with an emoji, that image is "tagged" with that emoji and is added to a server-wide collection of art that can be queried with the 'show' command. I also keep track of how many times an image has been tagged with a certain emoji, so you can see which image was most popular!\n\nCommands:\n'${prefix}help': display this help text\n'${prefix}show <emoji>': display a collection of images tagged with the given emoji\`\`\``;
 
 /**
+ * Function that executes bot command.
+ */
+// interface ICommand {
+// 	(msg: OmitPartialGroupDMChannel<Message<boolean>>, pieces: Array<string>): void;
+// }
+
+
+// const help:ICommand = function (msg: OmitPartialGroupDMChannel<Message<boolean>>, bits: Array<string>): void {
+// 	msg.reply(getQuip() + '\n' + help_text);
+// }
+
+/**
  * Returns helpful information about the bot.
  * @param {Message<boolean>} msg User command message
  * @param {Array<string>} bits User command message split into an array around spaces
- * @returns string Help string
  */
 function help(msg, bits) {
-	msg.reply(getQuip() + '\n' + help_text);
+	msg.reply(getQuip() + '\n' + help_text )
 }
+
 
 /**
  * Replies to msg with the links contained in rows.
@@ -101,8 +116,12 @@ function show(msg, pieces) {
  */
 const commands = {
 	'help' : help,
-	'show' : show,
-};
+	'show' : show
+}
+// const commands: {[key: string] : ICommand} = {
+// 	'help' : help,
+// 	'show' : show,
+// };
 
 /**
  * Gets the proper function to execute based
@@ -112,8 +131,8 @@ const commands = {
  * @param {string} cmd String command typed by user
  * @returns Function to execute for given command
  */
-function getCommand(cmd) {
+export function getCommand(cmd) {
 	return commands[cmd];
 }
 
-exports.getCommand = getCommand;
+// exports.getCommand = getCommand;
