@@ -1,7 +1,7 @@
 {
     "configurations": [
         {
-            "name": "Launch Program",
+            "name": "Run Bot",
             "program": "${workspaceFolder}/build/src/app.js",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "request": "launch",
