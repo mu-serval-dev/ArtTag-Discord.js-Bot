@@ -6,7 +6,7 @@ const def = new SlashCommandBuilder()
     .setDescription("Replies with pong!");
 
 const func:CommandExecuteFunc = async function (interaction: CommandInteraction) {
-    await interaction.followUp("pong!");
+    await interaction.reply("pong!");
 }
 
 const command:Command = {

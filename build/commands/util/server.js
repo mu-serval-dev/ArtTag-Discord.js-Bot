@@ -4,7 +4,7 @@ const def = new SlashCommandBuilder()
     .setName("server")
     .setDescription("Get information about the server.");
 const func = async function (interaction) {
-    await interaction.followUp(`This server is ${interaction.guild?.name} and has ${interaction.guild?.memberCount} members.`);
+    await interaction.reply(`This server is ${interaction.guild?.name} and has ${interaction.guild?.memberCount} members.`);
 };
 const command = {
     data: def,
