@@ -6,7 +6,7 @@ const def = new SlashCommandBuilder()
     .setDescription("Get information about the server.")
 
 const func:CommandExecuteFunc = async function (interaction: CommandInteraction) {
-    await interaction.followUp(`This server is ${interaction.guild?.name} and has ${interaction.guild?.memberCount} members.`)
+    await interaction.reply(`This server is ${interaction.guild?.name} and has ${interaction.guild?.memberCount} members.`)
 }
 
 const command:Command = {
