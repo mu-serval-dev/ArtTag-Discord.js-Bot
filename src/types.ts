@@ -1,11 +1,11 @@
-import { Client, Collection, SlashCommandBuilder, type CommandInteraction } from "discord.js";
+import { Client, Collection, SlashCommandBuilder, type CommandInteraction, type SlashCommandOptionsOnlyBuilder } from "discord.js";
 
 export interface CommandExecuteFunc {
 	(interaction: CommandInteraction) : Promise<void>
 }
 
 export interface Command {
-    data : SlashCommandBuilder,
+    data : SlashCommandBuilder | SlashCommandOptionsOnlyBuilder,
     execute: CommandExecuteFunc
 }
 
@@ -25,3 +25,5 @@ export function isCommand(object: any): object is Command {
 export class CommandClient extends Client {
 	commands : Collection<string, Command> = new Collection<string,Command>()
 }
+
+export const MAX_TAG_LENGTH = 60

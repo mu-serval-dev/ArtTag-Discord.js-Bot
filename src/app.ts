@@ -21,14 +21,14 @@ const command_files:Array<Dirent> = fs.readdirSync(main_folder, {"recursive" : t
 
 for (let i = 0; i < command_files.length; i++) {
 	const file = command_files[i]
-	console.info(`[INFO] Found command file ${file.name}`)
+	console.info(`[INFO] Importing command definition \`${file.name}\``)
 	const fpath = path.join(file.parentPath, file.name);
 	const rel_path =  "./" + path.relative(__dirname, fpath);
-	console.info(`[INFO] Importing ${fpath}`)
+	// console.info(`[INFO] Importing ${fpath}`)
 	const module = await import("file://" + fpath);
 	const command:Command = module.default;
 	if (!isCommand(command)) {
-		console.warn(`[WARN] Command file ${file.name} is missing some props, skipping`)
+		console.warn(`[WARN] Command definition \`${file.name}\` is missing some props, skipping`)
 		continue
 	}
 	// add command to client's collection
@@ -43,16 +43,16 @@ client.on(Events.InteractionCreate, async interaction => {
 	const command = client.commands.get(interaction.commandName)
 
 	if (!command) {
-		console.error(`[ERROR] No definition found for command ${interaction.commandName}`)
+		console.error(`[ERROR] No definition found for command \`${interaction.commandName}\``)
 		return
 	}
 
 	try {
 		await command.execute(interaction)
-		console.log(`[INFO] Responded to ${interaction.commandName} command`)
+		console.log(`[INFO] Responded to \`${interaction.commandName}\` command`)
 	}
 	catch (error) {
-		console.error(`[ERROR] Error when executing command ${interaction.commandName}:`)
+		console.error(`[ERROR] Error when executing command \`${interaction.commandName}\``)
 		console.error(error)
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp({content: 'There was an error executing this command!', ephemeral: true})
