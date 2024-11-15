@@ -26,4 +26,15 @@ export class CommandClient extends Client {
 	commands : Collection<string, Command> = new Collection<string,Command>()
 }
 
-export const MAX_TAG_LENGTH = 60
+
+
+export interface Image {
+    image_id: BigInt,
+    filename: string,
+    hash: string,
+}
+
+export interface Tag {
+    tag_id : BigInt,
+    tag_name: string
+}
