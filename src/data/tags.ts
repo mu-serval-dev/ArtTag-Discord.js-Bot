@@ -1,15 +1,35 @@
 import type { Tag } from "../types.js";
 
-const MAX_TAG_LENGTH = 50
-const UPDATE_INTERVAL_MS = 5000
+export const MAX_TAG_LENGTH = 50
+const UPDATE_INTERVAL_MS = 30000
+export const TAG_SEPARATOR = ","
 
 /**
  * Class for managing client state with respect to Tags.
  * Maintains a regularly updated list of Tag objects that
  * exist in backend.
  */
-class TagsViewModel {
-    private tagsList:Array<Tag> = []
+export class TagsViewModel {
+    // TODO: reset to empty array when testing is done
+    private tagsList:Array<Tag> = [
+        {
+            tag_id : 10n,
+            tag_name : "wiggy"
+        },
+        {
+            tag_id : 11n,
+            tag_name : "maeby"
+        },
+        {
+            tag_id : 12n,
+            tag_name : "lynxy"
+        },
+        {
+            tag_id : 12n,
+            tag_name : "evie"
+        }
+    ]
+    
     get newestId():BigInt {
         return (this.tagsList.length === 0)? 0n : this.tagsList[this.tagsList.length - 1].tag_id
     }
@@ -21,6 +41,7 @@ class TagsViewModel {
     }
 
     private fetchTags() {
+        console.log("[TagsViewModel] Called fetchTags()")
         // TODO: update tagsList by fetching all tags with id > newestTag.tag_id
     }
 
@@ -31,8 +52,8 @@ class TagsViewModel {
      * @returns Array of tags beginning with given prefix.
      */
     public getTagsWithPrefix(prefix: string, maxResults:number = 25): Array<Tag> {
-        const filtered = this.tagsList.filter(tag => {tag.tag_name.startsWith(prefix)})
-        return filtered.slice(0, Math.min(maxResults, filtered.length - 1))
+        const filtered = this.tagsList.filter(tag => {return tag.tag_name.startsWith(prefix, 0)})
+        return filtered.slice(0, Math.min(maxResults, filtered.length))
     }
 
     public addTag(name: string): boolean {

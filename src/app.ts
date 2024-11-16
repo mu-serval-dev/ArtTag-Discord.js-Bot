@@ -1,5 +1,5 @@
 import config from '../config.json' assert { type: 'json' };
-import {Events, GatewayIntentBits } from 'discord.js';
+import {AutocompleteInteraction, ChatInputCommandInteraction, Events, GatewayIntentBits, type CacheType, type Interaction } from 'discord.js';
 import fs, { Dirent } from 'node:fs'
 import  path from 'node:path'
 import { CommandClient, type Command, isCommand } from './types.js';
@@ -35,11 +35,8 @@ for (let i = 0; i < command_files.length; i++) {
 	client.commands.set(command.data.name, command)
 }
 
-client.on(Events.InteractionCreate, async interaction => {
-	// console.log(interaction);
-	// only care about slash commands
-	if (!interaction.isChatInputCommand()) return;
-	// console.log(interaction);
+async function handleSlashCommand(interaction: ChatInputCommandInteraction<CacheType>) {
+	const client = interaction.client as CommandClient
 	const command = client.commands.get(interaction.commandName)
 
 	if (!command) {
@@ -60,6 +57,38 @@ client.on(Events.InteractionCreate, async interaction => {
 		else {
 			await interaction.reply({content: 'There was an error executing this command!', ephemeral: true})
 		}
+	}
+}
+
+async function handleAutocomplete(interaction: AutocompleteInteraction<CacheType>) {
+	const client = interaction.client as CommandClient
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) {
+		console.error(`[ERROR] No definition found for command \`${interaction.commandName}\``);
+		return;
+	}
+
+	if (!command.autocomplete) {
+		console.error(`[ERROR] Command \`${interaction.commandName}\` has no autocomplete functionality`);
+		return;
+	}
+
+	try {
+		await command.autocomplete(interaction);
+	} catch (error) {
+		console.error(`[ERROR] Error when executing command \`${interaction.commandName}\``)
+		console.error(error);
+	}
+}
+
+
+client.on(Events.InteractionCreate, async interaction => {
+	if (interaction.isChatInputCommand()){
+		handleSlashCommand(interaction)
+	}
+	else if (interaction.isAutocomplete()) {
+		handleAutocomplete(interaction)
 	}
 })
 

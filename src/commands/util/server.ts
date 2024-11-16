@@ -11,6 +11,7 @@ const func:CommandExecuteFunc = async function (interaction: CommandInteraction)
 
 const command:Command = {
     data:def,
+    autocomplete: null,
     execute: func
 }
 

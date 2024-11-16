@@ -1,11 +1,17 @@
-import { Client, Collection, SlashCommandBuilder, type CommandInteraction, type SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { AutocompleteInteraction, Client, Collection, SlashCommandBuilder, type CommandInteraction, type SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { TagsViewModel } from "./data/tags.js";
 
 export interface CommandExecuteFunc {
 	(interaction: CommandInteraction) : Promise<void>
 }
 
+export interface AutocompleteHandler {
+    (interaction: AutocompleteInteraction) : Promise<void>
+}
+
 export interface Command {
     data : SlashCommandBuilder | SlashCommandOptionsOnlyBuilder,
+    autocomplete : AutocompleteHandler | null,
     execute: CommandExecuteFunc
 }
 
@@ -24,6 +30,7 @@ export function isCommand(object: any): object is Command {
  */
 export class CommandClient extends Client {
 	commands : Collection<string, Command> = new Collection<string,Command>()
+    tagsViewModel : TagsViewModel = new TagsViewModel()
 }
 
 
