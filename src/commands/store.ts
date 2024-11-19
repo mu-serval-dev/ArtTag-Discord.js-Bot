@@ -3,7 +3,7 @@ import { CommandClient, type AutocompleteHandler, type Command, type CommandExec
 import { MAX_TAG_LENGTH, TAG_SEPARATOR } from "../data/tags.js";
 
 const IMAGE_OPT_NAME = "image"
-const TEXT_OPT_NAME = "tag"
+const TAG_OPT_NAME = "tag"
 
 const def = new SlashCommandBuilder()
     .setName("store")
@@ -15,18 +15,18 @@ const def = new SlashCommandBuilder()
     .addStringOption((option) => option
         .setMaxLength(MAX_TAG_LENGTH)
         .setRequired(true)
-        .setName(TEXT_OPT_NAME)
+        .setName(TAG_OPT_NAME)
         .setAutocomplete(true)
         .setDescription("Tag for this image"))
 
 // TODO: string option.setAutocomplete with list of tags we pull from API
 
-const func:CommandExecuteFunc = async function (interaction: CommandInteraction) {
+const storeCommand:CommandExecuteFunc = async function (interaction: CommandInteraction) {
     // Widen type to use getAttachment/getString
     const options = <Omit<CommandInteractionOptionResolver<CacheType>,''>> interaction.options
 
     const image = options.getAttachment(IMAGE_OPT_NAME)
-    const tag = options.getString(TEXT_OPT_NAME)
+    const tag = options.getString(TAG_OPT_NAME)
 
     if (!image || !tag) {
         await interaction.reply(`Error, image or tag was missing`)
@@ -38,34 +38,30 @@ const func:CommandExecuteFunc = async function (interaction: CommandInteraction)
 }
 
 /**
- * Suggest tag or list of tags.
- * @param interaction 
+ * Suggest tag or list of tags based on
+ * current input for tags param.
+ * @param interaction AutocompleteInteraction
  */
-const handler:AutocompleteHandler = async function (interaction: AutocompleteInteraction) {
+const tagsAutocomplete:AutocompleteHandler = async function (interaction: AutocompleteInteraction) {
     const client = interaction.client as CommandClient
     const focusedValue = interaction.options.getFocused()
     const split = focusedValue.replaceAll(' ', '').split(TAG_SEPARATOR);
-    // console.log(`Focused value is ${focusedValue}`)
-    // console.log("Split: ", split)
 
     const last = split.pop()
-    // console.log("Split: ", split)
-    // console.log("Last: ", last)
 
+    // no autocomplete if nothing was entered
     if (!last || last === "") {
         await interaction.respond([])
         return
     }
-    const tag_choices = client.tagsViewModel.getTagsWithPrefix(last? last : '').filter(tag => {return !split.includes(tag.tag_name)}) // dont suggest tags that were already used
-    // console.log("Tag choices:")
-    console.log(tag_choices)
+
+    const tag_choices = client.tagsViewModel.getTagsWithPrefix(last)
+                                            .filter(tag => {return !split.includes(tag.tag_name)}) // dont suggest tags that were already used
     
     const rejoined = split.join(TAG_SEPARATOR)
-    // console.log("Rejoined: ", rejoined)
 
     const response: ApplicationCommandOptionChoiceData[] = tag_choices.map(tag => {
         const formatted = (split.length > 0)? `${rejoined},${tag.tag_name}` : tag.tag_name
-        // console.log("Formatted: ", formatted);
         return {
             name: formatted,
             value: formatted
@@ -77,8 +73,8 @@ const handler:AutocompleteHandler = async function (interaction: AutocompleteInt
 
 const command:Command = {
     data : def,
-    autocomplete: handler,
-    execute: func
+    autocomplete: tagsAutocomplete,
+    execute: storeCommand
 }
 
 export default command

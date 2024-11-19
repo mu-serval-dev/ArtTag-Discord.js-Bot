@@ -43,6 +43,7 @@ export class TagsViewModel {
     private fetchTags() {
         console.log("[TagsViewModel] Called fetchTags()")
         // TODO: update tagsList by fetching all tags with id > newestTag.tag_id
+        // NOTE: if tags can be deleted, we need another way to find if one was deleted
     }
 
     /**

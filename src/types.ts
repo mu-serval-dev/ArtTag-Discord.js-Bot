@@ -33,8 +33,6 @@ export class CommandClient extends Client {
     tagsViewModel : TagsViewModel = new TagsViewModel()
 }
 
-
-
 export interface Image {
     image_id: BigInt,
     filename: string,
