@@ -34,12 +34,16 @@ export class CommandClient extends Client {
 }
 
 export interface Image {
-    image_id: BigInt,
+    image_id: bigint,
     filename: string,
     hash: string,
 }
 
 export interface Tag {
-    tag_id : BigInt,
+    tag_id : bigint,
     tag_name: string
+}
+
+export function isTag(object: any): object is Tag {
+    return 'tag_id' in object && 'tag_name' in object;
 }

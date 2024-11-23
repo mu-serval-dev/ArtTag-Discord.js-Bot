@@ -1,7 +1,7 @@
 import type { Tag } from "../types.js";
-
+import { repo } from "./repository.js";
 export const MAX_TAG_LENGTH = 50
-const UPDATE_INTERVAL_MS = 30000
+const UPDATE_INTERVAL_MS = 5000
 export const TAG_SEPARATOR = ","
 
 /**
@@ -11,37 +11,31 @@ export const TAG_SEPARATOR = ","
  */
 export class TagsViewModel {
     // TODO: reset to empty array when testing is done
-    private tagsList:Array<Tag> = [
-        {
-            tag_id : 10n,
-            tag_name : "wiggy"
-        },
-        {
-            tag_id : 11n,
-            tag_name : "maeby"
-        },
-        {
-            tag_id : 12n,
-            tag_name : "lynxy"
-        },
-        {
-            tag_id : 12n,
-            tag_name : "evie"
-        }
-    ]
+    private tagsList:Array<Tag> = []
     
-    get newestId():BigInt {
-        return (this.tagsList.length === 0)? 0n : this.tagsList[this.tagsList.length - 1].tag_id
+    get newestId():bigint|null {
+        return (this.tagsList.length === 0)? null : this.tagsList[this.tagsList.length - 1].tag_id
     }
 
     constructor() {
         // TODO: register interval callback for fetching new tags from api
         // TODO: fetch initial list from API
-        setInterval(this.fetchTags, UPDATE_INTERVAL_MS)
+        
+        repo.getTags().then(data => {
+            this.tagsList = data
+            // console.log(this.newestId)
+        })
+        // need to call bind so it gets ref to newestId
+        setInterval(this.fetchTags.bind(this), UPDATE_INTERVAL_MS)
     }
 
     private fetchTags() {
-        console.log("[TagsViewModel] Called fetchTags()")
+        console.log("Fetching tags...")
+
+        repo.getTags(this.newestId).then(data => {
+            console.log(`Got`)
+            this.tagsList = this.tagsList.concat(data)
+        })
         // TODO: update tagsList by fetching all tags with id > newestTag.tag_id
         // NOTE: if tags can be deleted, we need another way to find if one was deleted
     }
