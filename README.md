@@ -7,9 +7,9 @@ Users that post images or links that embed an image in a discord channel that th
 The goal of this bot is to provide a tagging function such that a discord server in which art is frequently posted can sort of organize and retrieve images quickly.
 
 ###  Tools
-- PostgreSQL for Link Database
+- PostgreSQL + Express.js middleware for backend
 - Discord.js Discord API wrapper
-- Javascript
+- Typescript
 
 ### How To: Setup
 
