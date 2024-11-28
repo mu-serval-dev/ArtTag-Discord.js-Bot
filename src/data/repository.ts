@@ -1,7 +1,3 @@
-
-// TODO: add singleton for making API requests to backend
-// getTags(optionaly with id > a certain id)
-
 import { isTag, type Tag } from "../types.js";
 import config from '../../config.json' assert { type: 'json'};
 
