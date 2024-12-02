@@ -47,6 +47,7 @@ export class TagsViewModel {
      * @returns Array of tags beginning with given prefix.
      */
     public getTagsWithPrefix(prefix: string, maxResults:number = 25): Array<Tag> {
+        const cap = Math.max(maxResults, 1) //
         const filtered = this.tagsList.filter(tag => {return tag.tag_name.startsWith(prefix, 0)})
         return filtered.slice(0, Math.min(maxResults, filtered.length))
     }
@@ -62,18 +63,24 @@ export class TagsViewModel {
     }
 
     /**
-     * Check if a tag with the given name exists in the view model.
-     * @param name Tag name
-     * @returns True if a tag with that name exists in the local model
+     * Returns true iff a tag with the given name 
+     * exists in the view model.
      */
     public tagExists(name: string): boolean {
-        return this.tagsList.filter(tag => {tag.tag_name === name}).length != 0
+        for (let i = 0; i < this.tagsList.length; i++) {
+            const curr = this.tagsList[i]
+            if (curr.tag_name === name) {
+                return true;
+            }
+        }
+        return false;
+        // return this.tagsList.filter(tag => {tag.tag_name === name}).length != 0
     }
 
     /**
      * Return true iff the given tag name is valid.
      */
     public validateTagName(name: string): boolean {
-        return name.length <= MAX_TAG_LENGTH && !name.includes(',') && !name.includes(' ');
+        return name.length <= MAX_TAG_LENGTH && !name.includes(TAG_SEPARATOR) && !name.includes(' ');
     }
 }

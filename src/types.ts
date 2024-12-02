@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, Client, Collection, SlashCommandBuilder, type CommandInteraction, type SlashCommandOptionsOnlyBuilder } from "discord.js";
-import { TagsViewModel } from "./data/tags.js";
+import { TagsViewModel } from "./data/tags-model.js";
 
 export interface CommandExecuteFunc {
 	(interaction: CommandInteraction) : Promise<void>

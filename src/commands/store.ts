@@ -1,6 +1,6 @@
 import { CommandInteraction, SlashCommandBuilder, CommandInteractionOptionResolver, type CacheType, AutocompleteInteraction, type ApplicationCommandOptionChoiceData } from "discord.js";
 import { CommandClient, type AutocompleteHandler, type Command, type CommandExecuteFunc } from "../types.js";
-import { MAX_TAG_LENGTH, TAG_SEPARATOR } from "../data/tags.js";
+import { MAX_TAG_LENGTH, TAG_SEPARATOR } from "../data/tags-model.js";
 
 const IMAGE_OPT_NAME = "image"
 const TAG_OPT_NAME = "tag"

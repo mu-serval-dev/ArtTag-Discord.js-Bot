@@ -1,7 +1,7 @@
 import { isTag, type Tag } from "../types.js";
 import config from '../../config.json' assert { type: 'json'};
 
-class ArtTagAPIRepository {
+class ArtTagRepository {
     async getTags(afterId:bigint|null = null): Promise<Tag[]> {
         try {
             console.log(afterId)
@@ -13,12 +13,12 @@ class ArtTagAPIRepository {
             const response = await fetch(url);
 
             if (!response.ok) {
-                throw new Error(`Response status: ${response.status}`)
+                throw new Error(`getTags: Response status: ${response.status}`)
             }
 
             const json = await response.json()
             if (!Array.isArray(json)) {
-                throw new Error(`Response is not an array: ${json}`)
+                throw new Error(`getTags: Response is not an array: ${json}`)
             }
             return json.filter<Tag>(isTag);
         }
@@ -29,4 +29,4 @@ class ArtTagAPIRepository {
     }
 }
 
-export const repo = Object.freeze(new ArtTagAPIRepository())
+export const repo = Object.freeze(new ArtTagRepository())
