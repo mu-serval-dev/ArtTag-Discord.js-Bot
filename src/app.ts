@@ -1,4 +1,4 @@
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 import {AutocompleteInteraction, ChatInputCommandInteraction, Events, GatewayIntentBits, type CacheType, type Interaction } from 'discord.js';
 import fs, { Dirent } from 'node:fs'
 import  path from 'node:path'

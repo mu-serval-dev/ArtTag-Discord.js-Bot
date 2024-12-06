@@ -1,5 +1,5 @@
 import { isTag, type Tag } from "../types.js";
-import config from '../../config.json' assert { type: 'json'};
+import config from '../../config.json' with { type: 'json'};
 
 class ArtTagRepository {
     async getTags(afterId:bigint|null = null): Promise<Tag[]> {
