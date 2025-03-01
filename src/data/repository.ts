@@ -5,7 +5,7 @@ class ArtTagRepository {
     async getTags(afterId:bigint|null = null): Promise<Tag[]> {
         try {
             console.log(afterId)
-            const url = new URL("/tags", config.apiDomain)
+            const url = new URL("/tags", config.apiURL)
             if (afterId && afterId >= 0) {
                 url.searchParams.append('after_id', afterId.toString())
             }
