@@ -45,7 +45,7 @@ const storeCommand:CommandExecuteFunc = async function (interaction: CommandInte
 const tagsAutocomplete:AutocompleteHandler = async function (interaction: AutocompleteInteraction) {
     const client = interaction.client as CommandClient
     const focusedValue = interaction.options.getFocused()
-    const split = focusedValue.replaceAll(' ', '').split(TAG_SEPARATOR);
+    const split = focusedValue.split(TAG_SEPARATOR);
 
     const last = split.pop()
 
@@ -55,13 +55,15 @@ const tagsAutocomplete:AutocompleteHandler = async function (interaction: Autoco
         return
     }
 
+    // NOTE
+
     const tag_choices = client.tagsViewModel.getTagsWithPrefix(last)
                                             .filter(tag => {return !split.includes(tag.tag_name)}) // dont suggest tags that were already used
     
     const rejoined = split.join(TAG_SEPARATOR)
 
     const response: ApplicationCommandOptionChoiceData[] = tag_choices.map(tag => {
-        const formatted = (split.length > 0)? `${rejoined},${tag.tag_name}` : tag.tag_name
+        const formatted = (split.length > 0)? `${rejoined}${TAG_SEPARATOR}${tag.tag_name}` : tag.tag_name
         return {
             name: formatted,
             value: formatted

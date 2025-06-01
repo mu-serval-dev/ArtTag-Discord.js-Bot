@@ -2,7 +2,7 @@ import type { Tag } from "../types.js";
 import { repo } from "./repository.js";
 export const MAX_TAG_LENGTH = 50
 const UPDATE_INTERVAL_MS = 5000
-export const TAG_SEPARATOR = ","
+export const TAG_SEPARATOR = " "
 
 /**
  * Class for managing client state with respect to Tags.
