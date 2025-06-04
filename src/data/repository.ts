@@ -1,15 +1,17 @@
 import { isTag, type Tag } from "../types.js";
 import config from '../../config.json' with { type: 'json'};
 
+/**
+ * Connection to API.
+ */
 class ArtTagRepository {
-    async getTags(afterId:bigint|null = null): Promise<Tag[]> {
+    async getTags(createdAfter:string|null = null): Promise<Tag[]> {
         try {
-            console.log(afterId)
-            const url = new URL("/tags", config.apiURL)
-            if (afterId && afterId >= 0) {
-                url.searchParams.append('after_id', afterId.toString())
+            const url = new URL("/tags/list", config.apiURL)
+            if (createdAfter) {
+                url.searchParams.append('created_after', createdAfter)
             }
-            console.log(url.toString())
+            // console.log(url.toString())
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -20,7 +22,7 @@ class ArtTagRepository {
             if (!Array.isArray(json)) {
                 throw new Error(`getTags: Response is not an array: ${json}`)
             }
-            return json.filter<Tag>(isTag);
+            return json;
         }
         catch (error) {
             console.error(error)

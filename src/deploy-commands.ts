@@ -1,4 +1,4 @@
-import config from '../config.json' assert { type: 'json' };
+import config from '../config.json' with { type: 'json' };
 import fs, { Dirent } from 'node:fs'
 import  path from 'node:path'
 import { type Command, isCommand } from './types.js';
