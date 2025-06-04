@@ -11,3 +11,7 @@ Discord.js bot for storing art image links from various websites.
 ## Useful Dev Commands
 
 - `npm run watch` or `tsc --watch`: watch ts files and auto build to js
+
+- `npm run deploy` - deploy slash command definitions
+- `npm run build`
+- `npm start`

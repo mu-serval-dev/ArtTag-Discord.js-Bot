@@ -15,17 +15,42 @@ class ArtTagRepository {
             const response = await fetch(url);
 
             if (!response.ok) {
-                throw new Error(`getTags: Response status: ${response.status}`)
+                throw new Error(`received status ${response.status}`)
             }
 
             const json = await response.json()
             if (!Array.isArray(json)) {
-                throw new Error(`getTags: Response is not an array: ${json}`)
+                throw new Error(`response is not an array, got ${json}`)
             }
             return json;
         }
         catch (error) {
-            console.error(error)
+            console.error("[ERROR] getTags failed to fetch:", error)
+            return []
+        }
+    }
+
+    async getArtists(createdAfter:string|null = null): Promise<Tag[]> {
+        try {
+            const url = new URL("/artists/list", config.apiURL)
+            if (createdAfter) {
+                url.searchParams.append('created_after', createdAfter)
+            }
+            // console.log(url.toString())
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`received status ${response.status}`)
+            }
+
+            const json = await response.json()
+            if (!Array.isArray(json)) {
+                throw new Error(`response is not an array, got ${json}`)
+            }
+            return json;
+        }
+        catch (error) {
+            console.error("[ERROR] getArtists failed to fetch:", error)
             return []
         }
     }

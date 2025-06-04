@@ -1,6 +1,7 @@
-import type { Tag } from "../types.js";
+import type { Tag, Artist } from "../types.js";
 import { repo } from "./repository.js";
 export const MAX_TAG_LENGTH = 50
+export const MAX_ARTIST_LENGTH = 50
 const UPDATE_INTERVAL_MS = 5000
 export const TAG_SEPARATOR = " "
 
@@ -19,24 +20,43 @@ export class ViewModel {
     private tagsMap:Map<string, Tag> = new Map<string, Tag>()
 
     /**
+     * Map of artists, where key is artist name and value is Artist object.
+     */
+    private artistsMap:Map<string,Artist> = new Map<string, Artist>()
+
+    /**
      * The newest tag that was fetched from the backend.
      */
     private newestTag:Tag|null = null
+
+    /**
+     * The newest artist that was fetched from the backend.
+     */
+    private newestArtist:Artist|null = null
 
     /**
      * Create a new ViewModel instance.
      */
     constructor() {
         // initial tags fetch
-        repo.getTags()
+        this.fetchData()
 
-        // set interval to regularly fetch tags
+        // set interval to regularly fetch data from backend
         // need to bind so callback can access 'this' context
-        setInterval(this.fetchTags.bind(this), UPDATE_INTERVAL_MS)
+        // setInterval(this.fetchTags.bind(this), UPDATE_INTERVAL_MS)
+        setInterval(this.fetchData.bind(this), UPDATE_INTERVAL_MS)
     }
 
     /**
-     * Fetches tags from backend and updates tagsSet.
+     * Fetch data from API to update this viewmodel.
+     */
+    private fetchData() {
+        this.fetchTags()
+        this.fetchArtists()
+    }
+
+    /**
+     * Fetches tags from backend and updates tagsMap.
      * If newestTag is not null, fetches only tags created after it.
      */
     private fetchTags() {
@@ -57,15 +77,42 @@ export class ViewModel {
             //     console.info("[INFO] fetchTags: no new tags")
             // }
         })
-        .catch(error => {
-            console.error("[ERROR] fetchTags: failed to fetch:", error)
+        // .catch(error => {
+        //     console.error("[ERROR] fetchTags: failed to fetch:", error)
+        // })
+    }
+
+    /**
+     * Fetches artists from backend and updates artistsMap.
+     * If newestArtist is not null, fetches only artists created after it.
+     */
+    private fetchArtists() {
+        let createdAfter = null
+
+        if (this.newestArtist) {
+            createdAfter = this.newestArtist.time_created
+        }
+
+        repo.getArtists(createdAfter).then(data => {
+            
+            if (data.length > 0) {
+                console.log("[INFO] fetchArtists: got artists", data)
+                data.forEach(artist => {this.artistsMap.set(artist.name, Object.freeze(artist))})
+                this.newestArtist = data[data.length - 1] // last artist in the list is the newest
+            }
+            // else {
+            //     console.info("[INFO] fetchTags: no new tags")
+            // }
         })
+        // .catch(error => {
+        //     console.error("[ERROR] fetchTags: failed to fetch:", error)
+        // })
     }
 
     /**
      * Get all tags that do not have the names in the given set.
      * @param names Set of tag names to filter out.
-     * @returns Array of Tag objects that do not have the names in the given set.
+     * @returns Array of immutable Tag objects that do not have the names in the given set.
      */
     public getTagsNotIn(names:Set<string>): Array<Tag> {
         const tags = new Set(this.tagsMap.keys());
@@ -74,6 +121,22 @@ export class ViewModel {
         for (const key of keys) {
             result.push(this.tagsMap.get(key) as Tag);
         }
+        return result;
+    }
+
+    /**
+     * Get all artists whose name begins with the given prefix.
+     * @param name Prefix to filter on.
+     * @returns Array of immutable Artist objects whose name begins with the given prefix.
+     */
+    public getArtistsBeginningWith(prefix: string): Array<Artist> {
+        const artists = this.artistsMap.values();
+        const result = new Array<Artist>();
+        artists.forEach((artist, _) => {
+            if (artist.name.startsWith(prefix, 0)) {
+                result.push(artist)
+            }
+        })
         return result;
     }
 
@@ -99,7 +162,14 @@ export class ViewModel {
     /**
      * Return true iff the given tag name is valid.
      */
-    public validateTagName(name: string): boolean {
-        return name.length <= MAX_TAG_LENGTH && !name.includes(TAG_SEPARATOR);
+    public isValidTagName(name: string): boolean {
+        return name.length <= MAX_TAG_LENGTH && name.length > 0 && !name.includes(TAG_SEPARATOR);
+    }
+
+    /**
+     * Return true iff the given artist name is valid.
+     */
+    public isValidArtistName(name: string): boolean {
+        return name.length <= MAX_ARTIST_LENGTH && name.length > 0;
     }
 }

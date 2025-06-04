@@ -44,6 +44,11 @@ export interface Tag {
     time_created: string
 }
 
+export interface Artist {
+    name: string,
+    time_created: string
+}
+
 export function isTag(object: any): object is Tag {
     return 'tag_id' in object && 'tag_name' in object;
 }
