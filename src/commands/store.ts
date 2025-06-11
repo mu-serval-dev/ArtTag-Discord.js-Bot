@@ -1,10 +1,12 @@
 import { CommandInteraction, SlashCommandBuilder, CommandInteractionOptionResolver, type CacheType, AutocompleteInteraction, type ApplicationCommandOptionChoiceData } from "discord.js";
 import { CommandClient, type Artist, type AutocompleteHandler, type Command, type CommandExecuteFunc, type Tag } from "../types.js";
-import { MAX_TAG_LENGTH, TAG_SEPARATOR, MAX_ARTIST_LENGTH } from "../data/view-model.js";
+import { MAX_TAG_LENGTH, TAG_SEPARATOR, MAX_ARTIST_LENGTH, MAX_URL_LENGTH } from "../data/view-model.js";
 
 const IMAGE_OPT_NAME = "image"
 const TAG_OPT_NAME = "tags"
 const ARTIST_OPT_NAME = "artist"
+const URL_OPT_NAME = "source"
+const NSFW_OPT_NAME = "nsfw"
 
 const def = new SlashCommandBuilder()
     .setName("store")
@@ -25,6 +27,15 @@ const def = new SlashCommandBuilder()
         .setName(ARTIST_OPT_NAME)
         .setAutocomplete(true)
         .setDescription("Name of the artist"))
+    .addStringOption((option) => option
+        .setMaxLength(MAX_URL_LENGTH)
+        .setRequired(false)
+        .setName(URL_OPT_NAME)
+        .setDescription("Source url for the image"))
+    .addBooleanOption((option) => option
+        .setRequired(false)
+        .setName(NSFW_OPT_NAME)
+        .setDescription("Is this image nsfw?"))
 
 const storeCommand:CommandExecuteFunc = async function (interaction: CommandInteraction) {
     // Widen type to use getAttachment/getString
@@ -32,14 +43,28 @@ const storeCommand:CommandExecuteFunc = async function (interaction: CommandInte
 
     const image = options.getAttachment(IMAGE_OPT_NAME)
     const tags = options.getString(TAG_OPT_NAME)
-    const artist = options.getString(ARTIST_OPT_NAME) ?? 'NONE'
+    const artist = options.getString(ARTIST_OPT_NAME)
+    const url = options.getString(URL_OPT_NAME)
+    const nsfw = options.getBoolean(NSFW_OPT_NAME) ?? false
 
     if (!image || !tags) {
-        await interaction.reply(`Error, image or tag was missing`)
+        await interaction.reply(`Error, image or tags was missing`)
         return
     }
 
-    await interaction.reply(`Got image ${image.name} with tag ${tags} artist ${artist}`)
+    let params = [
+        `tags ${tags}`
+    ]
+
+    if (artist) {
+        params.push(`artist ${artist}`)
+    }
+    if (url) {
+        params.push(`source ${url}`)
+    }
+
+
+    await interaction.reply(`Got ${(nsfw)? 'nsfw': 'sfw'} image ${image.name} with ${params.join(", ")}`)
     // TODO: filter for image file type
 }
 
