@@ -54,6 +54,16 @@ class ArtTagRepository {
             return []
         }
     }
+
+    async createTags(tags:Array<string>): Promise<boolean> {
+        const url = new URL("/tags/create", config.apiURL)
+        // TODO: make sure len is < 50
+
+        const body = {
+            "tags" : tags
+        }
+        return false;
+    }
 }
 
 export const repo = Object.freeze(new ArtTagRepository())

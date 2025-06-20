@@ -52,3 +52,11 @@ export interface Artist {
 export function isTag(object: any): object is Tag {
     return 'tag_id' in object && 'tag_name' in object;
 }
+
+export interface StoreOptions {
+
+}
+
+export interface ValidationResult {
+    
+}

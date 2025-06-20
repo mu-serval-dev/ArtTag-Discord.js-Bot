@@ -142,7 +142,7 @@ export class ViewModel {
     }
 
 
-    public addTag(name: string): boolean {
+    public addTags(name: Array<string>): boolean {
         // TODO: try to create tag with given name
         // Call repo tmethod to add
         // If successful, get back id of new tag
@@ -152,12 +152,24 @@ export class ViewModel {
         return false
     }
 
+    public addArtist(name: string): boolean {
+        return false
+    }
+
     /**
      * Returns true iff a tag with the given name 
      * exists in the view model.
      */
     public tagExists(name: string): boolean {
         return this.tagsMap.has(name);
+    }
+
+    /**
+     * Returns true iff an artist with the given name 
+     * exists in the view model.
+     */
+    public artistExists(name: string): boolean {
+        return this.artistsMap.has(name)
     }
 
     /**
