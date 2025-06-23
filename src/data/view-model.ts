@@ -1,10 +1,12 @@
-import type { Tag, Artist } from "../types.js";
+import type { Tag, Artist, StoreOptions } from "../types.js";
 import { repo } from "./repository.js";
 export const MAX_TAG_LENGTH = 50
 export const MAX_ARTIST_LENGTH = 50
 export const MAX_URL_LENGTH = 2000
 const UPDATE_INTERVAL_MS = 5000
 export const TAG_SEPARATOR = " "
+export const MAX_IMG_SIZE_MB = 15
+export const MAX_NUM_TAGS = 50
 
 /**
  * Class for caching data the client needs for front end presentation, like getting
@@ -142,7 +144,7 @@ export class ViewModel {
     }
 
 
-    public addTags(name: Array<string>): boolean {
+    public addTags(tags: Array<string>): boolean {
         // TODO: try to create tag with given name
         // Call repo tmethod to add
         // If successful, get back id of new tag
@@ -184,5 +186,99 @@ export class ViewModel {
      */
     public isValidArtistName(name: string): boolean {
         return name.length <= MAX_ARTIST_LENGTH && name.length > 0;
+    }
+
+    /**
+     * Attempt to store an image. Returns a string error if fails.
+     * @param options Options for the store command, including the image, tags, and other metadata
+     * @returns Error message on failure
+     */
+    public async storeImage (options: StoreOptions): Promise<string | null> {
+        const err = this.validateStoreOptions(options)
+        if (err) {
+            return err;
+        }
+
+
+
+        //
+        return null;
+    }
+
+    /**
+     * Ensures all options provided to the store command are valid and
+     * follow the necessary rules. Does NOT check if some options (i.e., tags, artist)
+     * already exist on the back end.
+     * @param options 
+     * @returns Error message if something is invalid, else null
+     */
+    private validateStoreOptions(options: StoreOptions): string | null {
+        // VALIDATION
+    
+        // 1. image
+        //      - image type
+        if (!options.image.contentType?.startsWith("image/")) {
+            return 'Oops, that wasn\'t an image! Make sure your attachment is an JPEG, PNG, WebP, GIF or AVIF file'
+        }
+        //      - size
+        if (options.image.size > (MAX_IMG_SIZE_MB * 1000000)) {
+            return `Your image is too big! Make sure your image is less than ${MAX_IMG_SIZE_MB}MB`
+        }
+        // 2. tags
+        //      - no more than 50 tags
+        if (options.tags.length > MAX_NUM_TAGS) {
+            return `Too many tags! We only support up to ${MAX_NUM_TAGS} per image upload`
+        }
+
+        
+        //      - all valid (fit length / character rules)
+        const tagsToMake = [] // list of tags that aren't stored yet but are valid
+        for (let i = 0; i < options.tags.length; i++) {
+
+            const tag = options.tags[i]
+            if (!this.isValidTagName(tag)) {
+                return `'${tag}' is not a valid tag name`
+            }
+
+            if (!this.tagExists(tag)) {
+                tagsToMake.push(tag)
+            }
+
+            //      - get thags that don't exist
+            //          - if at least one:
+            //              - create all using endpoint
+            //                  - if fail: send back failure response to user
+            //                  - else: cont
+        }
+
+        if (!this.addTags(tagsToMake)) {
+            return 'Oops! Failed to store those tags'
+        }
+        // 3. artist
+        if (options.artist) {
+            if (!this.isValidArtistName(options.artist)) {
+                return `${options.artist} is not a valid artist name`
+            }
+            if (!this.artistExists(options.artist) && !this.addArtist(options.artist)) {
+                return `Oops! Failed to create that artist`
+            }
+        }
+        //      - if not null:
+        //          - if not exist:
+        //              - if is valid: create using endpoint
+        //                  - if fail: send back failure response to user
+        //                  - else: cont
+        // 4. url
+        if (options.url) {
+            try {
+                const url = new URL(options.url)
+            }
+            catch (_) {
+                return 'Oops! That url is invalid'
+            }
+        }
+        //      - if not null:
+        //          - make sure is valid url
+        return null;
     }
 }

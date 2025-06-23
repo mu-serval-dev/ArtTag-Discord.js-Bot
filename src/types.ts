@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, Client, Collection, SlashCommandBuilder, type CommandInteraction, type SlashCommandOptionsOnlyBuilder } from "discord.js";
+import { Attachment, AutocompleteInteraction, Client, Collection, SlashCommandBuilder, type CommandInteraction, type SlashCommandOptionsOnlyBuilder } from "discord.js";
 import { ViewModel } from "./data/view-model.js";
 
 export interface CommandExecuteFunc {
@@ -54,9 +54,14 @@ export function isTag(object: any): object is Tag {
 }
 
 export interface StoreOptions {
-
+    image: Attachment,
+    tags: Array<string>,
+    artist: string | null,
+    url: string | null,
+    nsfw: boolean
 }
 
 export interface ValidationResult {
-    
+    failure: String,
+    options: StoreOptions
 }

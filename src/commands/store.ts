@@ -1,6 +1,6 @@
 import { CommandInteraction, SlashCommandBuilder, CommandInteractionOptionResolver, type CacheType, AutocompleteInteraction, type ApplicationCommandOptionChoiceData } from "discord.js";
 import { CommandClient, type Artist, type AutocompleteHandler, type Command, type CommandExecuteFunc, type StoreOptions, type Tag } from "../types.js";
-import { MAX_TAG_LENGTH, TAG_SEPARATOR, MAX_ARTIST_LENGTH, MAX_URL_LENGTH } from "../data/view-model.js";
+import { TAG_SEPARATOR, MAX_ARTIST_LENGTH, MAX_URL_LENGTH} from "../data/view-model.js";
 
 const IMAGE_OPT_NAME = "image"
 const TAG_OPT_NAME = "tags"
@@ -45,53 +45,75 @@ const storeCommand:CommandExecuteFunc = async function (interaction: CommandInte
     const model = client.viewModel
 
     const image = options.getAttachment(IMAGE_OPT_NAME)
-    let tag_str = options.getString(TAG_OPT_NAME) ?? ""
+
+    if (!image) {
+        await interaction.reply("Oops! No image was attached")
+        return
+    }
+
+    let tag_str = options.getString(TAG_OPT_NAME)
+
+    if (!tag_str) {
+        await interaction.reply("Oops! No tags were given")
+        return
+    }
+
     const tags = tag_str.split(TAG_SEPARATOR)
 
-    if (tags.length == 0) {
-        await interaction.reply("Errmmmm tags list empty!!! 🤓")
-        return
-    }
+    // if (tags.size == 0) {
+    //     await interaction.reply("Errmmmm tags list empty!!! 🤓")
+    //     return
+    // }
 
     // Verify all tags exist
-    for (let i = 0; i < tags.length; i++) {
-        // TODO: create tags that don't exist
-        if (!model.tagExists(tags[i])) {
-            await interaction.reply(`Ermmmm tag '${tags[i]}' does not exist`)
-            return
-        }
+    // for (let i = 0; i < tags.length; i++) {
+    //     // TODOi: create tags that don't exist
+    //     if (!model.tagExists(tags[i])) {
+    //         await interaction.reply(`Ermmmm tag '${tags[i]}' does not exist`)
+    //         return
+    //     }
+    // }
+    const cmd_options = {
+        image: image,
+        tags: tags,
+        artist: options.getString(ARTIST_OPT_NAME),
+        url: options.getString(URL_OPT_NAME),
+        nsfw: options.getBoolean(NSFW_OPT_NAME) ?? false
     }
 
-    
-    
-    const artist = options.getString(ARTIST_OPT_NAME)
-    const url = options.getString(URL_OPT_NAME)
-    const nsfw = options.getBoolean(NSFW_OPT_NAME) ?? false
-
-    if (!image || !tags) {
-        await interaction.reply(`Error, image or tags was missing`)
+    const error  = await model.storeImage(cmd_options)
+    if (error) {
+        await interaction.reply(error)
         return
     }
+    
+    // const artist = options.getString(ARTIST_OPT_NAME)
+    // const url = options.getString(URL_OPT_NAME)
+    // const nsfw = options.getBoolean(NSFW_OPT_NAME) ?? false
 
-    let params = [
-        `tags ${tags}`
-    ]
+    // if (!image || !tags) {
+    //     await interaction.reply(`Error, image or tags was missing`)
+    //     return
+    // }
 
-    if (artist) {
-        if (!model.artistExists) {
-            await interaction.reply(`Ermmm artist '${artist}' does not exist!`)
-            // TODO: create artist if no exist alrdy
-            return
-        }
-        params.push(`artist ${artist}`)
-    }
-    if (url) {
-        params.push(`source ${url}`)
-    }
+    // let params = [
+    //     `tags ${tags}`
+    // ]
+
+    // if (artist) {
+    //     if (!model.artistExists) {
+    //         await interaction.reply(`Ermmm artist '${artist}' does not exist!`)
+    //         // TODO: create artist if no exist alrdy
+    //         return
+    //     }
+    //     params.push(`artist ${artist}`)
+    // }
+    // if (url) {
+    //     params.push(`source ${url}`)
+    // }
 
 
-    await interaction.reply(`Got ${(nsfw)? 'nsfw': 'sfw'} image ${image.name} with ${params.join(", ")}`)
-    // TODO: filter for image file type
+    await interaction.reply(`Saved image ${image.name}`)
 }
 
 /**
@@ -136,40 +158,6 @@ const handleTagsAutocomplete = async function (currentValue: string, interaction
     })
 
     await interaction.respond(response)
-}
-
-/**
- * Ensures all options provided to the store command are valid and
- * follow the necessary rules. Does NOT check if some options (i.e., tags, artist)
- * already exist on the back end.
- * @param options 
- * @returns Error message if something is invalid, else null
- */
-const validateOptions = function(options: StoreOptions): String | null {
-    // VALIDATION
-    // 1. image
-    //      - not null
-    //      - image type
-    //      - no more than 15MB
-    // 2. tags
-    //      - not null
-    //      - no more than 50 tags
-    //      - all valid (fit length / character rules)
-    //      - get those that don't exist
-    //          - if at least one:
-    //              - create using endpoint
-    //                  - if fail: send back failure response to user
-    //                  - else: cont
-    // 3. artist
-    //      - if not null:
-    //          - if not exist:
-    //              - if is valid: create using endpoint
-    //                  - if fail: send back failure response to user
-    //                  - else: cont
-    // 4. url
-    //      - if not null:
-    //          - make sure is valid url
-    return null;
 }
 
 /**
