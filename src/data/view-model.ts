@@ -199,7 +199,7 @@ export class ViewModel {
             return err;
         }
 
-
+        // TODO: check if there are similar images already stored
 
         //
         return null;
