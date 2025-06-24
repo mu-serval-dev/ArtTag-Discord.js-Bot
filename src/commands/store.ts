@@ -81,8 +81,9 @@ const storeCommand:CommandExecuteFunc = async function (interaction: CommandInte
         nsfw: options.getBoolean(NSFW_OPT_NAME) ?? false
     }
 
-    const error  = await model.storeImage(cmd_options)
+    const error = await model.storeImage(cmd_options)
     if (error) {
+        console.log(`Got error ${error}`)
         await interaction.reply(error)
         return
     }

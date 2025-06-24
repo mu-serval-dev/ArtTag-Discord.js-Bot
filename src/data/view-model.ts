@@ -144,19 +144,19 @@ export class ViewModel {
     }
 
 
-    public addTags(tags: Array<string>): boolean {
-        // TODO: try to create tag with given name
-        // Call repo tmethod to add
-        // If successful, get back id of new tag
-        //     If id is just newestTag's id + 1, add to list
-        //     If id is more than newestTag's id + 1, fetch updates from API
-        // If not, return false
-        return false
-    }
+    // public addTags(tags: Array<string>): boolean {
+    //     // TODO: try to create tag with given name
+    //     // Call repo tmethod to add
+    //     // If successful, get back id of new tag
+    //     //     If id is just newestTag's id + 1, add to list
+    //     //     If id is more than newestTag's id + 1, fetch updates from API
+    //     // If not, return false
+    //     return false
+    // }
 
-    public addArtist(name: string): boolean {
-        return false
-    }
+    // public addArtist(name: string): boolean {
+    //     return false
+    // }
 
     /**
      * Returns true iff a tag with the given name 
@@ -194,7 +194,7 @@ export class ViewModel {
      * @returns Error message on failure
      */
     public async storeImage (options: StoreOptions): Promise<string | null> {
-        const err = this.validateStoreOptions(options)
+        const err = await this.validateStoreOptions(options)
         if (err) {
             return err;
         }
@@ -207,12 +207,16 @@ export class ViewModel {
 
     /**
      * Ensures all options provided to the store command are valid and
-     * follow the necessary rules. Does NOT check if some options (i.e., tags, artist)
-     * already exist on the back end.
+     * follow the necessary rules. Returns null iff options are all valid.
+     * 
+     * Attempts to store any provided tags that are not on the backend
+     * already. Attempts to store artist name if provided and not on 
+     * backend already.
+     * 
      * @param options 
      * @returns Error message if something is invalid, else null
      */
-    private validateStoreOptions(options: StoreOptions): string | null {
+    private async validateStoreOptions(options: StoreOptions): Promise<string | null> {
         // VALIDATION
     
         // 1. image
@@ -231,11 +235,12 @@ export class ViewModel {
         }
 
         
-        //      - all valid (fit length / character rules)
+        
         const tagsToMake = [] // list of tags that aren't stored yet but are valid
+        // ensure all associated tags are valid
         for (let i = 0; i < options.tags.length; i++) {
-
             const tag = options.tags[i]
+
             if (!this.isValidTagName(tag)) {
                 return `'${tag}' is not a valid tag name`
             }
@@ -243,33 +248,30 @@ export class ViewModel {
             if (!this.tagExists(tag)) {
                 tagsToMake.push(tag)
             }
-
-            //      - get thags that don't exist
-            //          - if at least one:
-            //              - create all using endpoint
-            //                  - if fail: send back failure response to user
-            //                  - else: cont
         }
 
-        if (!this.addTags(tagsToMake)) {
-            return 'Oops! Failed to store those tags'
+        // make any missing tags
+        // NOTE: rely on regular api fetching to pull newly created tags
+        if (tagsToMake.length > 0 && !(await repo.createTags(tagsToMake))) {
+            console.log("Failed to make")
+            return 'Oops! Failed to store some new tags'
         }
+
         // 3. artist
         if (options.artist) {
+            // ensure artist name follows rules if present
             if (!this.isValidArtistName(options.artist)) {
                 return `${options.artist} is not a valid artist name`
             }
-            if (!this.artistExists(options.artist) && !this.addArtist(options.artist)) {
+            // attempt to store new artist name
+            if (!this.artistExists(options.artist) && !(await repo.createArtist(options.artist))) {
                 return `Oops! Failed to create that artist`
             }
         }
-        //      - if not null:
-        //          - if not exist:
-        //              - if is valid: create using endpoint
-        //                  - if fail: send back failure response to user
-        //                  - else: cont
+
         // 4. url
         if (options.url) {
+            // ensure url is valid if present
             try {
                 const url = new URL(options.url)
             }
@@ -277,8 +279,6 @@ export class ViewModel {
                 return 'Oops! That url is invalid'
             }
         }
-        //      - if not null:
-        //          - make sure is valid url
         return null;
     }
 }
